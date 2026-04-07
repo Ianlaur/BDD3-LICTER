@@ -1,0 +1,8 @@
+{
+  "directUrls": ["https://www.instagram.com/zara/"],
+  "resultsType": "posts",
+  "resultsLimit": 200,
+  "addParentData": true,
+  "scrapeComments": true,
+  "commentsLimit": 50
+}

@@ -2,304 +2,288 @@
 
 ## Architecture Overview
 
-The platform relies on specialised AI agents, each responsible for a specific domain of analysis. Agents consume cleaned data, run their analysis, and output structured insights to the dashboard and alerting system.
+The platform follows the imposed pipeline: data flows from the Excel base through Apify extraction, Make orchestration, OpenAI analysis, Supabase storage, and Antigravity dashboard.
 
 ```
-                    ┌─────────────────────┐
-                    │   Clean Data Store   │
-                    └──────────┬──────────┘
-                               │
-          ┌────────────────────┼────────────────────┐
-          │                    │                     │
-          ▼                    ▼                     ▼
-  ┌───────────────┐  ┌────────────────┐  ┌──────────────────┐
-  │  Scraper Agents│  │ Analysis Agents│  │ Reporting Agents │
-  └───────────────┘  └────────────────┘  └──────────────────┘
+[Excel 3 onglets] → [Apify] → [N8N] → [OpenAI API] → [Supabase] → [Antigravity]
+   Base historique    Scraping   Orchestration   IA/Analyse    Storage     Dashboard
 ```
 
 ---
 
-## 1. Scraper Agents
+## 1. Data Extraction — Apify Actors
 
-### 1.1 Google Reviews Scraper Agent
+> "Apify ne sert qu'à automatiser le flux de nouvelles données. Ne scrapez pas 10 ans d'historique."
+
+### 1.1 Google Reviews Actor
 | Field | Detail |
 |-------|--------|
-| **Purpose** | Extract store-level reviews for Zara and H&M |
-| **Input** | List of store URLs / Place IDs |
-| **Output** | Structured review data (rating, text, date, store, location) |
-| **Tools** | Python (Selenium / Playwright), Apify Google Maps Scraper |
-| **Schedule** | Weekly |
-| **Storage** | Raw reviews table in database |
+| **Purpose** | Extract store-level reviews for Zara |
+| **Input** | Store Place IDs / URLs |
+| **Output** | Reviews (rating, text, date, store, location) |
+| **Tool** | Apify Google Maps Scraper |
+| **Frequency** | Automated via Make scenario |
 
-### 1.2 Google Merchant Scraper Agent
+### 1.2 Trustpilot Actor
 | Field | Detail |
 |-------|--------|
-| **Purpose** | Extract product-level reviews from Google Shopping |
-| **Input** | Product identifiers / merchant feed |
-| **Output** | Product reviews (rating, text, date, product name, SKU) |
-| **Tools** | Python (requests, BeautifulSoup), Apify |
-| **Schedule** | Weekly |
+| **Purpose** | Extract brand reputation reviews and scores |
+| **Input** | Zara Trustpilot URL |
+| **Output** | Reviews (rating, text, date), trust score |
+| **Tool** | Apify Trustpilot Scraper |
 
-### 1.3 Trustpilot Scraper Agent
-| Field | Detail |
-|-------|--------|
-| **Purpose** | Extract brand-level reviews and trust scores |
-| **Input** | Zara and H&M Trustpilot URLs |
-| **Output** | Reviews (rating, text, date, category), overall trust score |
-| **Tools** | Python (Scrapy), Apify Trustpilot Scraper |
-| **Schedule** | Weekly |
-
-### 1.4 Instagram Scraper Agent
+### 1.3 Instagram Actor
 | Field | Detail |
 |-------|--------|
 | **Purpose** | Collect posts, comments, mentions, hashtags, UGC |
-| **Input** | Brand handles, relevant hashtags |
-| **Output** | Posts (text, likes, comments, date, media type, hashtags) |
-| **Tools** | Apify Instagram Scraper, Instaloader |
-| **Schedule** | Daily |
+| **Input** | @zara handle, relevant hashtags |
+| **Output** | Posts (text, likes, comments, date, media type) |
+| **Tool** | Apify Instagram Scraper |
 
-### 1.5 Facebook Scraper Agent
+### 1.4 TikTok Actor
 | Field | Detail |
 |-------|--------|
-| **Purpose** | Collect page reviews, comments, post mentions |
-| **Input** | Brand page URLs |
-| **Output** | Reviews, comments, post interactions |
-| **Tools** | Apify Facebook Scraper |
-| **Schedule** | Weekly |
+| **Purpose** | Collect TikTok videos, comments, mentions |
+| **Input** | #zara, brand mentions |
+| **Output** | Videos (description, views, likes, comments) |
+| **Tool** | Apify TikTok Scraper |
 
-### 1.6 YouTube Scraper Agent
+### 1.5 Reddit Actor
 | Field | Detail |
 |-------|--------|
-| **Purpose** | Collect video mentions, comments, engagement |
-| **Input** | Search queries (brand name, product names) |
-| **Output** | Videos (title, views, comments, sentiment indicators) |
-| **Tools** | YouTube Data API, Apify YouTube Scraper |
-| **Schedule** | Weekly |
+| **Purpose** | Collect threads and discussions mentioning Zara |
+| **Input** | Subreddits (r/fashion, r/zara), search queries |
+| **Output** | Threads (title, body, comments, upvotes) |
+| **Tool** | Apify Reddit Scraper |
 
-### 1.7 Reddit Scraper Agent
+### 1.6 LinkedIn Actor
 | Field | Detail |
 |-------|--------|
-| **Purpose** | Collect threads, comments, discussions mentioning brands |
-| **Input** | Subreddits (r/fashion, r/zara, etc.), search queries |
-| **Output** | Threads (title, body, comments, upvotes, date, subreddit) |
-| **Tools** | Reddit API (PRAW), Apify Reddit Scraper |
-| **Schedule** | Daily |
+| **Purpose** | Monitor brand perception and employer signals |
+| **Input** | Zara company page, search terms |
+| **Output** | Posts, engagement metrics |
+| **Tool** | Apify LinkedIn Scraper |
 
-### 1.8 LinkedIn Scraper Agent
+### 1.7 Glassdoor Actor
 | Field | Detail |
 |-------|--------|
-| **Purpose** | Monitor brand perception and employer branding signals |
-| **Input** | Company pages, relevant search terms |
-| **Output** | Posts, engagement metrics, employer review signals |
-| **Tools** | Apify LinkedIn Scraper |
-| **Schedule** | Weekly |
-
-### 1.9 External Reviews Scraper Agent
-| Field | Detail |
-|-------|--------|
-| **Purpose** | Aggregate reviews from other third-party platforms |
-| **Input** | Platform-specific URLs |
-| **Output** | Normalised review data |
-| **Tools** | Python (Scrapy), platform-specific Apify actors |
-| **Schedule** | Weekly |
+| **Purpose** | Extract employee reviews and employer perception |
+| **Input** | Zara Glassdoor page |
+| **Output** | Reviews (rating, pros, cons, date, role) |
+| **Tool** | Apify Glassdoor Scraper |
 
 ---
 
-## 2. Data Processing Agents
+## 2. Orchestration — N8N (OBLIGATOIRE)
 
-### 2.1 Data Cleaning Agent
-| Field | Detail |
-|-------|--------|
-| **Purpose** | Clean and normalise all incoming raw data |
-| **Input** | Raw scraped data from all sources |
-| **Processing** | Deduplication, text normalisation, encoding fixes, missing value handling, language detection |
-| **Output** | Clean, structured data in standardised schema |
-| **Tools** | Python (pandas, polars, regex, langdetect) |
-| **Trigger** | Runs after each scraper completes |
+> N8N is the chosen orchestration layer. All workflows pass through N8N workflows.
 
-### 2.2 Data Enrichment Agent
-| Field | Detail |
-|-------|--------|
-| **Purpose** | Enrich cleaned data with metadata |
-| **Input** | Cleaned data |
-| **Processing** | Geolocation tagging, language tagging, category classification, entity extraction |
-| **Output** | Enriched data ready for analysis |
-| **Tools** | Python, NLP models (spaCy, transformers) |
-| **Trigger** | Runs after cleaning agent completes |
+### 2.1 Data Collection Workflow
+```
+Cron Trigger (scheduled) → Run Apify Actors → Collect results → Route to cleaning
+```
+- Triggers Apify actors on schedule
+- Collects raw output from each actor
+- Routes data to the cleaning workflow
+
+### 2.2 Data Cleaning & Enrichment Workflow
+```
+Receive raw data → Deduplicate → Normalize → Detect language → Send to OpenAI
+```
+- Deduplication of entries
+- Text normalization (encoding, dates, formats)
+- Language detection
+- Routes cleaned data to OpenAI for analysis
+
+### 2.3 AI Analysis Workflow
+```
+Receive cleaned data → OpenAI API calls → Structure results → Store in Supabase
+```
+- Sends cleaned text to OpenAI for sentiment analysis
+- Receives structured insights
+- Formats and stores in Supabase
+
+### 2.4 Dashboard Update Workflow
+```
+New data in Supabase → Trigger → Update Antigravity dashboard → Notify
+```
+- Watches for new analysed data in Supabase
+- Updates dashboard KPIs and visualizations
+- Sends notifications if alerts triggered
+
+### 2.5 Crisis Alert Workflow
+```
+Sentiment spike detected → Evaluate severity → Route alert (Slack/Email)
+```
+- Monitors sentiment scores for anomalies
+- Classifies severity (low → critical)
+- Dispatches alerts to appropriate channels
 
 ---
 
-## 3. Analysis Agents
+## 3. AI Analysis — OpenAI API Agents
 
 ### 3.1 Sentiment Analysis Agent
 | Field | Detail |
 |-------|--------|
-| **Purpose** | Analyse tone and sentiment across all text-based data |
-| **Input** | Cleaned reviews, social media posts, comments |
-| **Processing** | NLP sentiment classification (positive, negative, neutral), emotion detection, aspect-based sentiment |
-| **Output** | Sentiment scores per source, per product, per store, over time |
-| **Tools** | Python, transformers (BERT/RoBERTa fine-tuned), TextBlob, VADER |
+| **Purpose** | Analyse tone and sentiment across all text data |
+| **Input** | Cleaned reviews, social posts, comments |
+| **Processing** | Classify positive/negative/neutral, detect emotions, aspect-based sentiment |
+| **Output** | Sentiment scores per source, product, store, over time |
+| **Tool** | OpenAI API (GPT-4) via N8N |
 | **KPIs** | Overall sentiment score, sentiment trend, sentiment by channel |
 
 ### 3.2 Crisis Detection Agent
 | Field | Detail |
 |-------|--------|
-| **Purpose** | Detect and flag potential brand crises in real time |
-| **Input** | Sentiment scores, volume metrics, social media mentions |
-| **Processing** | Anomaly detection (spike in negative sentiment, unusual volume), keyword monitoring (recall, scandal, lawsuit, boycott) |
-| **Output** | Crisis alerts with severity level (low, medium, high, critical) |
-| **Tools** | Python, statistical anomaly detection, LLM-based classification |
-| **Trigger** | Continuous monitoring (runs every scraping cycle) |
-| **Alert channels** | Slack, email, dashboard notification |
+| **Purpose** | Detect potential brand crises from signal spikes |
+| **Input** | Sentiment scores, volume metrics, social mentions |
+| **Processing** | Anomaly detection, keyword monitoring (recall, scandal, boycott) |
+| **Output** | Crisis alerts with severity level |
 | **Thresholds** | |
 | | - **Low**: 10% increase in negative sentiment over 24h |
-| | - **Medium**: 25% increase or negative viral post (>10K engagements) |
-| | - **High**: 50% increase or mainstream media pickup |
+| | - **Medium**: 25% increase or viral negative post |
+| | - **High**: 50% increase or media pickup |
 | | - **Critical**: Trending topic + sustained negative spike |
 
 ### 3.3 Product Health Agent
 | Field | Detail |
 |-------|--------|
-| **Purpose** | Score individual products by correlating multiple data signals |
-| **Input** | Product reviews, return rates, social mentions, sentiment scores |
-| **Processing** | Multi-signal correlation: review rating + return rate + social sentiment → health score |
-| **Output** | Per-product health score (0-100), flagged products, trend direction |
-| **Tools** | Python, scikit-learn, custom scoring model |
-| **Use cases** | Identify defective products, underperformers, rising stars |
+| **Purpose** | Score individual products by correlating review signals |
+| **Input** | Product reviews, social mentions, sentiment scores |
+| **Processing** | Multi-signal correlation → health score |
+| **Output** | Per-product health score (0-100), flagged products |
 
 ### 3.4 Trend Detection Agent
 | Field | Detail |
 |-------|--------|
-| **Purpose** | Identify emerging consumer trends before they peak |
-| **Input** | Social media posts, search trends, UGC content, review themes |
-| **Processing** | Topic modeling, keyword velocity tracking, hashtag analysis, cross-platform signal correlation |
-| **Output** | Emerging trends with confidence score, growth trajectory |
-| **Tools** | Python, LDA/BERTopic, time-series analysis |
-| **Use cases** | Spot fashion trends, anticipate demand shifts, inform merchandising |
+| **Purpose** | Identify emerging consumer trends |
+| **Input** | Social posts, UGC, review themes, hashtags |
+| **Processing** | Topic extraction, keyword velocity, cross-platform signals |
+| **Output** | Emerging trends with confidence score |
 
 ### 3.5 Competitive Benchmarking Agent
 | Field | Detail |
 |-------|--------|
-| **Purpose** | Compare Zara vs H&M across all collected dimensions |
-| **Input** | All cleaned and analysed data for both brands |
-| **Processing** | Side-by-side KPI comparison, gap analysis, relative positioning |
-| **Output** | Competitive scorecard, positioning matrix, gap reports |
-| **Metrics compared** | |
-| | - Overall sentiment (per channel) |
-| | - Review ratings (stores + products) |
-| | - Social media engagement |
-| | - Crisis frequency and response time |
-| | - Product return rates |
-| | - Trend adoption speed |
-| **Tools** | Python, custom comparison framework |
+| **Purpose** | Position Zara vs competitors on all dimensions |
+| **Input** | All analysed data for Zara + competitor signals |
+| **Processing** | Side-by-side KPI comparison, gap analysis |
+| **Output** | Competitive scorecard, positioning insights |
+
+### 3.6 COMEX Insight Synthesizer
+| Field | Detail |
+|-------|--------|
+| **Purpose** | Transform raw analysis into COMEX-ready insights |
+| **Input** | All agent outputs |
+| **Processing** | Reduce 1500 lines of verbatims → 3 actionable insights |
+| **Output** | Executive summary, recommendations, key signals |
+| **Target** | "Si un membre du COMEX n'a que 2 minutes..." |
 
 ---
 
-## 4. Reporting Agents
+## 4. Storage — Supabase
 
-### 4.1 Dashboard Feed Agent
-| Field | Detail |
-|-------|--------|
-| **Purpose** | Prepare and push structured data to the dashboard |
-| **Input** | All agent outputs (sentiment, crisis, product health, trends, competitive) |
-| **Processing** | Aggregation, formatting, caching for fast dashboard queries |
-| **Output** | Dashboard-ready data endpoints (API / database views) |
-| **Tools** | Python, FastAPI / database views |
-| **Trigger** | After each analysis cycle |
+### Database Schema (planned)
 
-### 4.2 Investor Magazine Agent
-| Field | Detail |
-|-------|--------|
-| **Purpose** | Auto-generate a periodic brand health report for investors |
-| **Input** | Aggregated KPIs, trend summaries, competitive position |
-| **Processing** | LLM-based narrative generation, chart/table generation, layout formatting |
-| **Output** | PDF magazine with executive summary, KPIs, charts, insights |
-| **Tools** | Python, LLM (GPT/Claude), matplotlib/plotly, reportlab/weasyprint |
-| **Schedule** | Monthly (configurable) |
-| **Sections** | |
-| | 1. Executive Summary |
-| | 2. Brand Health Score |
-| | 3. Sentiment Overview |
-| | 4. Product Performance |
-| | 5. Crisis Log |
-| | 6. Competitive Position (vs H&M) |
-| | 7. Emerging Trends |
-| | 8. Recommendations |
-
-### 4.3 Alert Dispatch Agent
-| Field | Detail |
-|-------|--------|
-| **Purpose** | Route alerts from crisis detection to appropriate channels |
-| **Input** | Crisis alerts from Crisis Detection Agent |
-| **Processing** | Severity-based routing, deduplication, escalation logic |
-| **Output** | Notifications via Slack, email, dashboard |
-| **Tools** | Python, Slack API, SMTP, webhook integrations |
-| **Trigger** | Real-time (on alert creation) |
+| Table | Description |
+|-------|-------------|
+| `raw_reviews` | Raw scraped reviews from all sources |
+| `raw_social` | Raw social media posts and mentions |
+| `clean_data` | Cleaned and normalised data |
+| `sentiment_scores` | Sentiment analysis results |
+| `product_health` | Product health scores |
+| `trends` | Detected trends |
+| `alerts` | Crisis alerts and notifications |
+| `kpis` | Aggregated KPIs for dashboard |
+| `competitive` | Competitive benchmark data |
 
 ---
 
-## Workflow Orchestration
+## 5. Dashboard — Antigravity
 
-### Execution Order
+### Dashboard Views
+
+| View | Content |
+|------|---------|
+| **Overview** | Brand health score, key KPIs, alert status |
+| **Sentiment** | Sentiment over time, by channel, by product |
+| **Product Performance** | Product health scores, flagged items |
+| **Social Listening** | Real-time social mentions, trending topics |
+| **Crisis Monitor** | Active alerts, severity, response status |
+| **Competitive** | Zara vs competitors positioning |
+| **Trends** | Emerging trends, growth trajectories |
+
+### KPI Selection Criteria
+> "Documentez vos choix : pourquoi ces KPIs ? Pourquoi ces sources ?"
+- Every chart must answer a specific business question
+- No vanity metrics — only actionable KPIs
+- Designed for a COMEX member with 2 minutes
+
+---
+
+## 6. Magazine Exécutif (PDF, 5 pages max)
+
+| Page | Content |
+|------|---------|
+| 1 | Executive Summary — brand health at a glance |
+| 2 | Sentiment & Reputation — key signals and trends |
+| 3 | Product Intelligence — top/bottom performers, issues |
+| 4 | Competitive Position — Zara vs market |
+| 5 | Recommendations — 3 actionable next steps |
+
+---
+
+## Full Workflow Orchestration (N8N)
 
 ```
-Step 1 (Scheduled)
-├── All Scraper Agents run in parallel
-│   ├── Google Reviews Scraper
-│   ├── Google Merchant Scraper
-│   ├── Trustpilot Scraper
-│   ├── Instagram Scraper
-│   ├── Facebook Scraper
-│   ├── YouTube Scraper
-│   ├── Reddit Scraper
-│   ├── LinkedIn Scraper
-│   └── External Reviews Scraper
+SCHEDULED TRIGGER
 │
-Step 2 (Triggered by Step 1 completion)
-├── Data Cleaning Agent
-└── Data Enrichment Agent
+├─→ Apify Actors (parallel)
+│   ├── Google Reviews
+│   ├── Trustpilot
+│   ├── Instagram
+│   ├── TikTok
+│   ├── Reddit
+│   ├── LinkedIn
+│   └── Glassdoor
 │
-Step 3 (Triggered by Step 2 completion)
-├── All Analysis Agents run in parallel
-│   ├── Sentiment Analysis Agent
+├─→ Data Cleaning Module
+│   ├── Deduplicate
+│   ├── Normalize
+│   └── Validate
+│
+├─→ OpenAI Analysis (parallel)
+│   ├── Sentiment Agent
 │   ├── Crisis Detection Agent
 │   ├── Product Health Agent
-│   ├── Trend Detection Agent
-│   └── Competitive Benchmarking Agent
+│   ├── Trend Agent
+│   ├── Competitive Agent
+│   └── COMEX Synthesizer
 │
-Step 4 (Triggered by Step 3 completion)
-├── Dashboard Feed Agent
-├── Alert Dispatch Agent (also triggered in real-time by Crisis Agent)
-└── Investor Magazine Agent (monthly)
+├─→ Supabase Storage
+│   └── Append to relevant tables
+│
+├─→ Antigravity Dashboard
+│   └── Auto-refresh KPIs and views
+│
+└─→ Alerts (if triggered)
+    ├── Slack notification
+    └── Email notification
 ```
-
-### Orchestration Tools
-- **Airflow** or **Prefect** for DAG-based workflow scheduling
-- **Celery** for async task execution
-- **Cron** as fallback for simple scheduling
 
 ---
 
-## Agent Summary Table
+## Agent Summary
 
-| # | Agent | Type | Schedule | Priority |
-|---|-------|------|----------|----------|
-| 1.1 | Google Reviews Scraper | Scraper | Weekly | High |
-| 1.2 | Google Merchant Scraper | Scraper | Weekly | High |
-| 1.3 | Trustpilot Scraper | Scraper | Weekly | Medium |
-| 1.4 | Instagram Scraper | Scraper | Daily | High |
-| 1.5 | Facebook Scraper | Scraper | Weekly | Medium |
-| 1.6 | YouTube Scraper | Scraper | Weekly | Medium |
-| 1.7 | Reddit Scraper | Scraper | Daily | Medium |
-| 1.8 | LinkedIn Scraper | Scraper | Weekly | Low |
-| 1.9 | External Reviews Scraper | Scraper | Weekly | Medium |
-| 2.1 | Data Cleaning Agent | Processing | On trigger | Critical |
-| 2.2 | Data Enrichment Agent | Processing | On trigger | High |
-| 3.1 | Sentiment Analysis Agent | Analysis | On trigger | Critical |
-| 3.2 | Crisis Detection Agent | Analysis | Continuous | Critical |
-| 3.3 | Product Health Agent | Analysis | On trigger | High |
-| 3.4 | Trend Detection Agent | Analysis | On trigger | Medium |
-| 3.5 | Competitive Benchmarking Agent | Analysis | On trigger | High |
-| 4.1 | Dashboard Feed Agent | Reporting | On trigger | High |
-| 4.2 | Investor Magazine Agent | Reporting | Monthly | Medium |
-| 4.3 | Alert Dispatch Agent | Reporting | Real-time | Critical |
+| # | Agent | Layer | Tool |
+|---|-------|-------|------|
+| 1.1–1.7 | Scraper Actors (7) | Extraction | Apify |
+| 2.1–2.5 | Orchestration Workflows (5) | Orchestration | N8N |
+| 3.1 | Sentiment Analysis | Analysis | OpenAI API |
+| 3.2 | Crisis Detection | Analysis | OpenAI API |
+| 3.3 | Product Health | Analysis | OpenAI API |
+| 3.4 | Trend Detection | Analysis | OpenAI API |
+| 3.5 | Competitive Benchmarking | Analysis | OpenAI API |
+| 3.6 | COMEX Synthesizer | Analysis | OpenAI API |
+| 4 | Supabase Storage | Storage | Supabase |
+| 5 | Dashboard | Visualisation | Antigravity |

@@ -1,0 +1,10 @@
+{
+  "searches": ["Zara fashion", "Zara clothing quality", "Zara haul"],
+  "type": "posts",
+  "sort": "new",
+  "time": "month",
+  "maxItems": 300,
+  "proxy": {
+    "useApifyProxy": true
+  }
+}

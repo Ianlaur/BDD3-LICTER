@@ -1,0 +1,8 @@
+{
+  "startUrls": [
+    { "url": "https://www.trustpilot.com/review/zara.com" }
+  ],
+  "maxReviews": 500,
+  "reviewsSort": "recency",
+  "includeReviewText": true
+}

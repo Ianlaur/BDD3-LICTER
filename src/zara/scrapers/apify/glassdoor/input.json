@@ -1,0 +1,7 @@
+{
+  "companyNames": ["Zara", "Inditex"],
+  "maxReviews": 300,
+  "reviewsSort": "DATE",
+  "includeReviewText": true,
+  "scrapeRatings": true
+}

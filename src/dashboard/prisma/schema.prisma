@@ -1,0 +1,216 @@
+// Zara Social Data Intelligence — Prisma schema
+// Models the post-pipeline analytics layer used by the dashboard.
+// Source data is produced by the scrapers + cleaning + analysis agents in src/zara/.
+//
+// All dashboard tables live in the `dashboard` Postgres schema, isolated from
+// the Python pipeline's tables in `public`.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  schemas  = ["dashboard"]
+}
+
+// ---------------------------------------------------------------------------
+// Stores — Zara physical locations referenced by reviews and KPIs.
+// ---------------------------------------------------------------------------
+model Store {
+  id          String   @id @default(cuid())
+  code        String   @unique // internal store code (e.g. "ZAR-FR-001")
+  name        String
+  city        String
+  country     String   // ISO-3166 alpha-2 (e.g. "FR", "ES")
+  region      String?  // optional regional grouping
+  address     String?
+  lat         Float
+  lng         Float
+  openedAt    DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  reviews         Review[]
+  sentimentScores SentimentScore[]
+  alerts          Alert[]
+  kpis            Kpi[]
+
+  @@index([country])
+  @@index([city])
+  @@schema("dashboard")
+}
+
+// ---------------------------------------------------------------------------
+// Reviews — raw review records from Trustpilot, Google Reviews, etc.
+// One row per review post-cleaning.
+// ---------------------------------------------------------------------------
+model Review {
+  id            String   @id @default(cuid())
+  source        String   // "trustpilot" | "google" | "tiktok" | "instagram" | ...
+  externalId    String?  // platform id, used for dedup
+  author        String?
+  rating        Int?     // 1..5 when available
+  title         String?
+  body          String
+  language      String?  // ISO-639-1 (e.g. "fr", "en")
+  url           String?
+  postedAt      DateTime
+  collectedAt   DateTime @default(now())
+
+  storeId       String?
+  store         Store?   @relation(fields: [storeId], references: [id], onDelete: SetNull)
+
+  sentimentScore SentimentScore?
+
+  @@unique([source, externalId])
+  @@index([postedAt])
+  @@index([source])
+  @@index([storeId])
+  @@schema("dashboard")
+}
+
+// ---------------------------------------------------------------------------
+// SentimentScore — output of the sentiment analysis agent for a single review.
+// One-to-one with Review. Aggregated views can also reference Store directly.
+// ---------------------------------------------------------------------------
+model SentimentScore {
+  id         String   @id @default(cuid())
+  reviewId   String   @unique
+  review     Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  storeId    String?
+  store      Store?   @relation(fields: [storeId], references: [id], onDelete: SetNull)
+
+  // -1.0 (very negative) .. 1.0 (very positive)
+  polarity   Float
+  // 0.0 .. 1.0 model confidence
+  confidence Float
+  label      String   // "negative" | "neutral" | "positive"
+  topics     String[] // e.g. ["fitting room", "staff", "queue"]
+  createdAt  DateTime @default(now())
+
+  @@index([label])
+  @@index([storeId])
+  @@schema("dashboard")
+}
+
+// ---------------------------------------------------------------------------
+// ProductHealth — per-product health snapshot from the product_health agent.
+// ---------------------------------------------------------------------------
+model ProductHealth {
+  id              String   @id @default(cuid())
+  productCode     String   // SKU or product family code
+  productName     String
+  category        String   // "tops" | "bottoms" | "outerwear" | ...
+  // 0..100 composite score
+  healthScore     Float
+  reviewCount     Int
+  averageRating   Float
+  returnRate      Float?   // 0..1, when available
+  topComplaints   String[] // free text labels
+  topPraises      String[]
+  capturedAt      DateTime @default(now())
+
+  @@index([category])
+  @@index([capturedAt])
+  @@schema("dashboard")
+}
+
+// ---------------------------------------------------------------------------
+// Trend — output of the trends agent. Tracks rising/falling topics over time.
+// ---------------------------------------------------------------------------
+model Trend {
+  id           String   @id @default(cuid())
+  topic        String
+  category     String?  // "product" | "service" | "brand" | "competitor"
+  // weekly mention count, can be backfilled
+  mentionCount Int
+  // -1.0..1.0 — week over week change in mentions
+  momentum     Float
+  sentiment    Float    // average polarity for this topic this period
+  periodStart  DateTime
+  periodEnd    DateTime
+  createdAt    DateTime @default(now())
+
+  @@index([topic])
+  @@index([periodStart])
+  @@schema("dashboard")
+}
+
+// ---------------------------------------------------------------------------
+// Alert — output of the crisis-detection agent.
+// One row per fired alert; resolution is tracked in-place.
+// ---------------------------------------------------------------------------
+model Alert {
+  id         String      @id @default(cuid())
+  severity   AlertLevel
+  title      String
+  message    String
+  source     String      // "sentiment_drop" | "spike" | "rating_drop" | ...
+  storeId    String?
+  store      Store?      @relation(fields: [storeId], references: [id], onDelete: SetNull)
+
+  triggeredAt DateTime   @default(now())
+  resolvedAt  DateTime?
+  resolved    Boolean    @default(false)
+
+  @@index([severity])
+  @@index([resolved])
+  @@index([triggeredAt])
+  @@schema("dashboard")
+}
+
+enum AlertLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+
+  @@schema("dashboard")
+}
+
+// ---------------------------------------------------------------------------
+// Kpi — pre-computed KPI snapshots for the dashboard's overview tiles.
+// Each row is one KPI for one entity (brand-wide if storeId is null).
+// ---------------------------------------------------------------------------
+model Kpi {
+  id          String   @id @default(cuid())
+  name        String   // "brand_health" | "nps" | "review_volume" | ...
+  value       Float
+  unit        String?  // "%" | "score" | "count"
+  // optional delta vs previous period (-1..1 or absolute)
+  delta       Float?
+  periodStart DateTime
+  periodEnd   DateTime
+
+  storeId     String?
+  store       Store?   @relation(fields: [storeId], references: [id], onDelete: SetNull)
+
+  createdAt   DateTime @default(now())
+
+  @@index([name])
+  @@index([periodEnd])
+  @@index([storeId])
+  @@schema("dashboard")
+}
+
+// ---------------------------------------------------------------------------
+// Competitive — competitor benchmark snapshots from the competitive agent.
+// ---------------------------------------------------------------------------
+model Competitive {
+  id            String   @id @default(cuid())
+  competitor    String   // "H&M" | "Mango" | "Uniqlo" | "Shein"
+  metric        String   // "brand_health" | "sentiment" | "share_of_voice"
+  zaraValue     Float
+  competitorValue Float
+  unit          String?
+  periodStart   DateTime
+  periodEnd     DateTime
+  createdAt     DateTime @default(now())
+
+  @@index([competitor])
+  @@index([metric])
+  @@schema("dashboard")
+}

@@ -1,0 +1,10 @@
+{
+  "searchTerms": ["Zara", "Zara fashion", "Zara clothing"],
+  "maxReviews": 500,
+  "language": "en",
+  "personalDataOptions": {
+    "scrapeReviewerName": false,
+    "scrapeReviewerId": false
+  },
+  "reviewsSort": "newest"
+}

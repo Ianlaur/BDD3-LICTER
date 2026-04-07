@@ -148,6 +148,6 @@ Build a comprehensive dashboard with automated workflows and scrapers to collect
 | **Data Cleaning** | Python (pandas, polars), custom ML pipeline |
 | **Storage** | PostgreSQL / BigQuery / S3 |
 | **Analysis & Agents** | Python, LLM-based agents, workflow orchestrator |
-| **Dashboard** | TBD (Streamlit / Dash / React) |
-| **Scheduling** | Cron / Airflow / Prefect |
+| **Dashboard** | Antigravity |
+| **Orchestration** | N8N (OBLIGATOIRE) |
 | **Alerting** | Slack / Email / Webhook integrations |

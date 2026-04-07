@@ -1,1 +1,121 @@
+# =============================================================================
+# BDD3-LICTER — Git Ignore Rules
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# macOS
+# -----------------------------------------------------------------------------
 .DS_Store
+.AppleDouble
+.LSOverride
+
+# -----------------------------------------------------------------------------
+# Data files (NEVER commit raw or processed data)
+# -----------------------------------------------------------------------------
+data/raw/
+data/clean/
+data/excel/
+*.csv
+*.xlsx
+*.xls
+*.json.gz
+
+# Keep directory structure
+!data/raw/.gitkeep
+!data/clean/.gitkeep
+!data/excel/.gitkeep
+
+# -----------------------------------------------------------------------------
+# Secrets & environment
+# -----------------------------------------------------------------------------
+src/zara/config/.env
+.env
+.env.*
+!.env.example
+!src/zara/config/.env.example
+
+# -----------------------------------------------------------------------------
+# Python
+# -----------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+*.egg
+.installed.cfg
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.python-version
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# Type checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pytype/
+.pyre/
+
+# -----------------------------------------------------------------------------
+# Node / N8N (if running locally)
+# -----------------------------------------------------------------------------
+node_modules/
+.npm
+.node_repl_history
+
+# -----------------------------------------------------------------------------
+# Editors & IDEs
+# -----------------------------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# -----------------------------------------------------------------------------
+# Logs & temporary files
+# -----------------------------------------------------------------------------
+*.log
+*.tmp
+*.bak
+*.orig
+logs/
+tmp/
+
+# -----------------------------------------------------------------------------
+# Apify local output (if using Apify CLI)
+# -----------------------------------------------------------------------------
+apify_storage/
+storage/

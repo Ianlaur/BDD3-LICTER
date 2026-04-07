@@ -1,0 +1,10 @@
+{
+  "profiles": ["zara"],
+  "resultsPerPage": 100,
+  "shouldDownloadVideos": false,
+  "shouldDownloadCovers": false,
+  "shouldDownloadSubtitles": false,
+  "shouldDownloadSlideshowImages": false,
+  "searchSection": "",
+  "maxProfilesPerQuery": 1
+}

@@ -1,0 +1,67 @@
+# =============================================================================
+# BDD3-LICTER — Python Dependencies
+# Zara Social Data Intelligence Project
+# =============================================================================
+# Install:  pip install -r requirements.txt
+# Upgrade:  pip install -r requirements.txt --upgrade
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# AI / OpenAI
+# -----------------------------------------------------------------------------
+openai>=1.30.0
+
+# -----------------------------------------------------------------------------
+# Database — Supabase
+# -----------------------------------------------------------------------------
+supabase>=2.4.0
+postgrest>=0.16.0          # Supabase REST client (transitive, pinned for stability)
+
+# -----------------------------------------------------------------------------
+# Data processing
+# -----------------------------------------------------------------------------
+pandas>=2.2.0
+numpy>=1.26.0
+openpyxl>=3.1.0            # Read/write .xlsx (initial Excel dataset)
+xlrd>=2.0.1                # Read legacy .xls files
+
+# -----------------------------------------------------------------------------
+# Text processing & NLP
+# -----------------------------------------------------------------------------
+langdetect>=1.0.9          # Language detection for multilingual reviews
+emoji>=2.11.0              # Strip/parse emojis from social text
+beautifulsoup4>=4.12.0     # HTML tag removal from scraped content
+lxml>=5.2.0                # Fast HTML/XML parser (used by BeautifulSoup)
+
+# Optional NLP (heavier — uncomment if needed):
+# spacy>=3.7.0             # NER, dependency parsing
+# nltk>=3.8.1              # Stopwords, tokenisation
+
+# -----------------------------------------------------------------------------
+# HTTP / API
+# -----------------------------------------------------------------------------
+httpx>=0.27.0              # Async HTTP client (used by openai SDK)
+requests>=2.31.0           # Synchronous HTTP (Apify polling, webhooks)
+python-dotenv>=1.0.0       # Load src/zara/config/.env in local development
+
+# -----------------------------------------------------------------------------
+# Date handling
+# -----------------------------------------------------------------------------
+python-dateutil>=2.9.0     # Parse arbitrary date strings from scrapers
+
+# -----------------------------------------------------------------------------
+# Utilities
+# -----------------------------------------------------------------------------
+pydantic>=2.7.0            # Data validation / schema models
+tqdm>=4.66.0               # Progress bars for batch processing
+tenacity>=8.3.0            # Retry logic with exponential backoff
+
+# -----------------------------------------------------------------------------
+# Development / testing
+# -----------------------------------------------------------------------------
+pytest>=8.2.0
+pytest-asyncio>=0.23.0
+python-dotenv>=1.0.0       # also used in tests
+black>=24.4.0              # Code formatter
+ruff>=0.4.0                # Fast linter (replaces flake8)
+mypy>=1.10.0               # Static type checking

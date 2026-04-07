@@ -72,9 +72,7 @@ Les données sont collectées depuis trois grandes catégories de sources :
 #### Automatisation & Scheduling
 | Outil | Rôle |
 |-------|------|
-| **Airflow / Prefect** | Orchestration des workflows (DAGs) |
-| **Celery** | Exécution asynchrone des tâches |
-| **Cron** | Scheduling simple (fallback) |
+| **N8N** | Orchestration des workflows (OBLIGATOIRE) |
 
 ---
 
@@ -158,7 +156,7 @@ Les données extraites sont stockées dans un **data lake** avant traitement :
 ┌─────────────────────────────────────────────────────────────────────┐
 │                    EXTRACTION & AUTOMATISATION                      │
 │  Python (Scrapy, Selenium, PRAW) │ Apify (actors no-code)         │
-│  Scheduling: Airflow / Prefect / Cron                              │
+│  Orchestration: N8N (OBLIGATOIRE)                                  │
 └─────────────────────────┬───────────────────────────────────────────┘
                           │
                           ▼
