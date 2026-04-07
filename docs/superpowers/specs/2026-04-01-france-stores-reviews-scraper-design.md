@@ -94,6 +94,20 @@ One JSON object per line:
 }
 ```
 
+**`code` generation rule** (explicit — this is the Phase 3 join key and the `dashboard.Store.code` UNIQUE constraint):
+
+```python
+if zara_locator_id is not None:
+    code = f"ZAR-FR-{zara_locator_id}"
+else:
+    # Fallback path (Selenium rendered-page scrape, no stable id)
+    code = f"ZAR-FR-{slugify(city)}-{slugify(name)}"
+```
+
+`slugify` lowercases, strips accents, replaces non-alphanum with `-`, collapses runs. Produces e.g. `ZAR-FR-paris-zara-paris-haussmann`.
+
+**Required-field rule:** `lat` and `lng` are non-nullable in `dashboard.Store` (verified against `src/dashboard/prisma/schema.prisma` — both declared as `Float` without `?`). If either is missing from the source data, **drop the store** and log to `stores.errors.jsonl` with reason `missing_coords`. `address` is nullable and may be omitted.
+
 ### Phase 2 output: `reviews.jsonl`
 
 One JSON object per line:
@@ -148,122 +162,193 @@ parsed_postedAt     →  postedAt
 store.id (joined)   →  storeId
 ```
 
-**externalId derivation:**
+**externalId derivation (date-free for true idempotency):**
 
 ```
 externalId = sha1(
   store_code || "|" ||
   author     || "|" ||
-  iso_postedAt[:10] || "|" ||
-  body[:120]
+  body[:200]
 ).hexdigest()[:32]
 ```
 
-Day-precision date is intentional: Google's relative-date parser is day-accurate at best, so we don't want hour-level jitter changing the hash on re-scrape. `body[:120]` guards against authors who post the same short comment twice on different days, which is rare enough to ignore.
+**Why no date in the hash:** Google Maps exposes relative dates ("il y a 2 mois"), which we parse in Phase 3 by anchoring to `scraped_at`. Anchoring means the same review re-scraped two weeks later resolves to a different absolute date — if the date were in the hash, every re-run would create duplicate rows. Dropping it from the hash makes the key stable across re-scrapes.
 
-The compound `(source, externalId)` UNIQUE constraint is the dedup key. `ON CONFLICT (source, externalId) DO NOTHING` skips any review we already have.
+**Collision risk:** two different reviews from the same author on the same store with the same first 200 characters is vanishingly rare (would require a copy-paste spammer repeating identical text). Acceptable for hackathon scope. Not acceptable forever — when we add Trustpilot / Instagram / etc., a unified dedup key will need to incorporate the platform's stable review id where available.
+
+The compound `(source, externalId)` UNIQUE constraint is the dedup key. `ON CONFLICT (source, "externalId") DO NOTHING` skips any review we already have.
 
 ## Phase details
 
 ### Phase 1 — Stores
 
-1. Try Zara's public locator JSON endpoint with `requests` (e.g., `https://www.zara.com/itxrest/2/catalog/store/...`). If it returns 200 and the payload looks right, parse it directly — no Selenium needed for stores.
-2. **Fallback:** if the endpoint shape has changed or returns an error, drive Selenium against `https://www.zara.com/fr/en/stores-locator` and scrape the rendered list.
-3. Filter: keep only `country == "FR"` and physical stores (drop pickup points, lockers, popups without coordinates).
-4. Map each record to the Phase 1 output schema.
-5. Write atomically: write to `stores.jsonl.tmp`, then `os.rename` over `stores.jsonl`. No partial files visible to Phase 2.
-6. Print a summary: `"Phase 1: 102 French stores written to data/raw/france/stores.jsonl"`.
+**Primary path (JSON endpoint, no Selenium):**
+
+1. GET Zara's public locator JSON endpoint with `requests`. Candidate endpoints observed on zara.com in prior work:
+   - `https://www.zara.com/itxrest/2/catalog/store/{store_code}/physical-stores` (returns a list keyed by country)
+   - `https://www.zara.com/fr/en/stores-locator/search?lat={lat}&lng={lng}&radius={km}` (geo query)
+2. Use a realistic User-Agent header. If the response is JSON and has `>= 50` stores with country `FR`, use it. Otherwise fall through.
+3. For each record, map:
+   - `id` or `storeId` → `zara_locator_id`
+   - `name` → `name`
+   - `city` / `addressLines[].city` → `city`
+   - `addressLines[].join(", ")` → `address`
+   - `location.lat` / `location.lng` → `lat`, `lng`
+4. Filter: `country == "FR"`, drop pickup points / lockers (absent `location` coords or `type != "physical_store"`).
+
+**Fallback path (Selenium on the rendered page):**
+
+Triggered only if the JSON endpoint returns a non-JSON body, an HTTP 4xx/5xx, or fewer than 20 FR stores (sanity floor).
+
+1. Launch the shared Selenium driver from `browser.py`.
+2. Navigate to `https://www.zara.com/fr/en/stores-locator`.
+3. Handle the consent banner (see "Google consent / cookie walls" below — same logic applies to Zara's OneTrust banner).
+4. The page renders a store list on the left with name + address strings. Enumerate every `[data-qa-id="store-list-item"]` (or equivalent — the exact selector is a `config.py` constant).
+5. For each item:
+   - `name` from the card header
+   - `address` from the card body
+   - `city` = extract from address (last line before postal code, regex-based)
+   - `lat` / `lng`: **not available from the DOM.** Geocode via the OpenStreetMap Nominatim API (free, no auth, 1 req/s rate limit) using `f"{name}, {address}"` as the query. Cache results in `data/raw/france/geocode_cache.json` so reruns don't re-geocode.
+   - `zara_locator_id` is **not available** on the fallback path. `code` uses the slug fallback rule defined in "Data model mapping."
+6. If geocoding fails for a store, drop it to `stores.errors.jsonl` with reason `missing_coords`.
+
+**Common tail (both paths):**
+
+7. Write each valid record to `stores.jsonl` atomically: write to `stores.jsonl.tmp`, then `os.rename` over `stores.jsonl`. No partial files visible to Phase 2.
+8. Print a summary: `"Phase 1: 102 French stores written to data/raw/france/stores.jsonl (path: json_endpoint)"` including which path was used and how many stores were dropped.
 
 ### Phase 2 — Reviews (the hard part)
 
 Selenium driver setup (`browser.py`):
-- Vanilla `selenium.webdriver.Chrome`
-- `--user-data-dir=data/raw/france/chrome-profile` (persists cookies + accepted Google consent across runs)
+- Vanilla `selenium.webdriver.Chrome` (no undetected-chromedriver)
+- `--user-data-dir=data/raw/france/chrome-profile` (persists cookies + accepted consent across runs)
 - Headless **off** by default (Google flags headless aggressively); a `--headless` flag is available for the Loom recording or CI but not the default
 - Window size 1280×900
-- `webdriver-manager` resolves the chromedriver binary
+- Chromedriver binary resolved by **Selenium Manager** (built into Selenium 4.6+, no `webdriver-manager` dependency)
+- Driver factory also exposes `polite_sleep(min_s, max_s)` and `click_consent_if_present()` helpers used by both phases
 
-For each store in `stores.jsonl`:
+**Google consent / cookie walls (first run):**
 
-1. **Skip-if-done check:** if any record with this `store_code` already exists in `reviews.jsonl`, skip. This is the resume mechanism.
-2. **Search:** navigate to `https://www.google.com/maps/search/Zara+{name}+{city}` (URL-encoded).
+A fresh `chrome-profile` will hit `consent.google.com` before any map loads. `browser.py` handles this automatically:
+
+1. After every `driver.get()` call, check whether current URL host contains `consent.google.com` OR the DOM has a visible `[aria-modal="true"]` with text matching `/accept|reject|accepter|refuser|tout/i`.
+2. If found, click the "Reject all" / "Tout refuser" button (privacy-preferred; works for anonymous scraping).
+3. Wait for navigation back to the original target URL.
+4. This is idempotent — subsequent runs reuse the same `chrome-profile`, skip the consent wall, and `click_consent_if_present()` is a no-op.
+
+Document in `README.md` that if the consent-click automation fails (Google changes the markup), the operator can manually click "Reject all" once in the persistent profile and the skip-check will cover all future runs.
+
+**Startup politeness on resume:** First action of any Phase 2 run waits 15–30s before the first navigation. Reason: a previous run may have exited on CAPTCHA minutes ago. The 60s-per-20-stores cooldown is in-process only and resets on restart, so the startup grace closes that hole.
+
+**For each store in `stores.jsonl`:**
+
+1. **Skip-if-done check:** load `reviews.completed.txt` (one `store_code` per line) into a set at startup. Skip any store whose code is in the set. This file is the authoritative "done" marker — it is written *only after* a store's full batch has been flushed to `reviews.jsonl`.
+2. **Search:** navigate to `https://www.google.com/maps/search/Zara+{name}+{city}` (URL-encoded). Run `click_consent_if_present()`.
 3. **First-result click:** wait for the result list selector, click the first card.
 4. **Open Reviews tab:** locate by aria-label or button text `"Avis"` / `"Reviews"`, click.
-5. **Filter language:** click "Sort" → "Most relevant" (default). Language filter is enforced post-hoc in cleaning by `langdetect`; Google's UI language filter is unreliable across regions.
-6. **Scroll loop:** find the scrollable reviews container, scroll to bottom, wait, count rendered review cards. Stop when `count >= 50` or three consecutive scrolls produce no new cards.
-7. **Extract per card:**
+5. **Filter language:** not enforced in the UI (Google's language filter is unreliable across regions). Language filtering happens in Phase 3 — see langdetect rules there.
+6. **Scroll loop:** find the scrollable reviews container, scroll to bottom, wait 2–4s, count rendered review cards. Stop when `count >= 50` or three consecutive scrolls produce no new cards.
+7. **Extract per card** (into an in-memory list — not yet written to disk):
    - Author display name
    - Star rating (parse from `aria-label="X stars"`)
-   - "More" button click if review is truncated, then text body
+   - "More" button click if review is truncated, then full text body
    - Relative date string ("il y a 2 mois", "il y a une semaine")
    - Permalink to the review (for the `url` field)
-8. **Per-store delays:** 2–4s between scrolls, 8–15s after the store completes, **60s cooldown every 20 stores**.
-9. **Append:** write each store's reviews to `reviews.jsonl` (append mode, one JSON per line, flush after each store so a crash loses at most one store's worth).
+8. **Atomic per-store flush:** after the extraction loop finishes successfully:
+   1. Append the in-memory list to `reviews.jsonl` as one write
+   2. Append `store_code` to `reviews.completed.txt`
+   3. fsync both files
+
+   If the process crashes **before** step 8.1, nothing is written and the skip-check correctly treats the store as not-done on resume. If it crashes **between** 8.1 and 8.2, `reviews.jsonl` has the records but `reviews.completed.txt` does not — on the next run the store is re-scraped and Phase 3's `ON CONFLICT DO NOTHING` handles the overlap cleanly. Cost of this corner case: one store's worth of wasted Selenium time on resume. Acceptable.
+
+9. **Per-store delays:** 2–4s between scrolls within a store; 8–15s pause after the store completes; **60s cooldown every 20 stores**. The 60s/20-store cadence is a starting value — tune based on observed CAPTCHA frequency during the first real run.
 10. **Errors:**
-    - Store not found on Maps → write `{store_code, error: "not_found"}` to `reviews.errors.jsonl`, continue.
-    - Selector not found / DOM changed → write `{store_code, error: "selector", details}` to errors file, continue.
-    - CAPTCHA detected (specific URL pattern or known DOM marker) → save a screenshot, log the offending store, **exit cleanly** so the JSONL is preserved and the run can resume later.
-    - Generic exception → retry once after 30s, then log to errors file and continue.
+    - Store not found on Maps → write `{store_code, error: "not_found"}` to `reviews.errors.jsonl`, mark store as completed (so resume skips it), continue.
+    - Selector not found / DOM changed → write `{store_code, error: "selector", details}` to errors file, do NOT mark completed (so a config fix + re-run picks it up), continue.
+    - CAPTCHA detected (URL match on `/sorry/` or known DOM marker) → save a screenshot to `data/raw/france/captcha-<timestamp>.png`, log the offending store, **exit cleanly** with exit code 2 so the JSONL is preserved and the run can resume later.
+    - Generic exception → retry once after 30s, then log to errors file and continue (no completed mark).
 
 ### Phase 3 — Load
 
-1. Read `stores.jsonl`. Upsert into `dashboard.Store` via `psycopg`:
-   ```sql
-   INSERT INTO dashboard."Store" (id, code, name, city, country, address, lat, lng, "createdAt", "updatedAt")
-   VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
-   ON CONFLICT (code) DO UPDATE SET
-     name = EXCLUDED.name,
-     address = EXCLUDED.address,
-     lat = EXCLUDED.lat,
-     lng = EXCLUDED.lng,
-     "updatedAt" = NOW();
-   ```
-   `id` is generated client-side using `cuid` (matches the Prisma schema's default).
+**Transaction strategy:** one transaction per store (store row + its reviews), **not** one transaction for the entire load. Rationale: a bad review on store 47 should not roll back the 46 stores already loaded. Each store is independently committable and the re-run cost of a failed store is bounded.
 
-2. Build a `code → id` lookup from the result.
+1. Open a single `psycopg` connection with `autocommit=False`. Build `store_code → store_id` map as we go.
 
-3. Read `reviews.jsonl`. For each record:
-   - **Normalize body:** strip whitespace, collapse multiple spaces, drop if empty after cleaning.
-   - **Detect language:** run `langdetect` on the body. Drop if not French. (Belt and suspenders — the search is in France but Google still surfaces some English reviews.)
-   - **Parse date:** convert "il y a 2 mois" → absolute `datetime` using `python-dateutil` + a small French regex helper. Anchor to `scraped_at` to avoid drift on re-runs.
-   - **Compute externalId:** as defined above.
-   - **Resolve storeId:** lookup by `store_code` in the map built in step 2.
-   - **Reuse existing helpers:** `src/zara/cleaning/pipeline.py` already has `clean_review_record()` for normalization. Import and reuse it instead of duplicating logic. If its output shape doesn't match, adapt the call site in Phase 3 — do not fork the cleaner.
+2. Read `stores.jsonl`. For each store record:
+   - Generate `id` client-side using the `cuid` package (version 1 format, matches Prisma's `@default(cuid())`). Pin `cuid==0.4` in requirements — verify against `src/dashboard/prisma/schema.prisma` at implementation time; if the Prisma schema ever switches to `cuid2`, update the dependency accordingly.
+   - Upsert into `dashboard.Store`:
+     ```sql
+     INSERT INTO dashboard."Store"
+       (id, code, name, city, country, address, lat, lng, "createdAt", "updatedAt")
+     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
+     ON CONFLICT (code) DO UPDATE SET
+       name      = EXCLUDED.name,
+       address   = EXCLUDED.address,
+       lat       = EXCLUDED.lat,
+       lng       = EXCLUDED.lng,
+       "updatedAt" = NOW()
+     RETURNING id;
+     ```
+   - Store `code → id` in the lookup map.
+   - Commit the store row immediately (so the map is durable even if the reviews for this store fail).
 
-4. Upsert into `dashboard.Review`:
-   ```sql
-   INSERT INTO dashboard."Review"
-     (id, source, "externalId", author, rating, body, language, url, "postedAt", "collectedAt", "storeId")
-   VALUES (...)
-   ON CONFLICT (source, "externalId") DO NOTHING;
-   ```
+3. Read `reviews.jsonl` grouped by `store_code`. For each store's review batch:
+   - Begin a transaction.
+   - For each review record:
+     - **Reuse existing helpers:** call `src/zara/cleaning/pipeline.py`'s `clean_review_record()` for normalization (whitespace, trimming, character cleanup). If its current signature doesn't fit, adapt the call site here — do not fork the cleaner.
+     - **Normalize body:** strip whitespace, collapse multiple spaces. Drop if empty after cleaning → counter `dropped_empty`.
+     - **Language gate:**
+       - `DetectorFactory.seed = 0` (makes `langdetect` deterministic).
+       - If `len(body) < 20` characters: assume French (the search is geo-scoped to France; `langdetect` is unreliable on very short text). Set `language = "fr"`.
+       - Else: run `langdetect.detect(body)`. Drop if result is not `"fr"` → counter `dropped_non_french`.
+     - **Parse date:** convert "il y a 2 mois" → absolute `datetime` using a small French regex helper + `python-dateutil.relativedelta`. Anchor to the review's `scraped_at` timestamp (already in the JSONL from Phase 2), not to `datetime.now()`, so the parse is stable across re-runs. Drop if unparseable → counter `dropped_unparseable`.
+     - **Compute externalId:** per the hash rule in "Data model mapping."
+     - **Resolve storeId:** lookup by `store_code` in the map. If missing (store failed Phase 1 or upsert) → drop with counter `dropped_no_store`.
+     - **Insert:**
+       ```sql
+       INSERT INTO dashboard."Review"
+         (id, source, "externalId", author, rating, body, language, url, "postedAt", "collectedAt", "storeId")
+       VALUES (%s, 'google', %s, %s, %s, %s, 'fr', %s, %s, NOW(), %s)
+       ON CONFLICT (source, "externalId") DO NOTHING;
+       ```
+       `id` is a new `cuid()`. Use `cursor.rowcount` to distinguish inserted vs skipped.
+   - Commit the store's review batch. On any DB exception: rollback just this batch, log `{store_code, error}` to `load.errors.jsonl`, continue with the next store.
 
-5. Print a summary:
+4. Print a summary:
    ```
    Phase 3 complete:
-     Stores upserted:    102
-     Reviews inserted:   4823
-     Reviews skipped:    192 (already in DB)
-     Reviews dropped:    47  (empty body, non-French, or unparseable date)
+     Stores upserted:      102
+     Reviews inserted:     4823
+     Reviews skipped:      192 (already in DB)
+     Reviews dropped:      47  (empty: 12 | non-french: 28 | unparseable: 5 | no store: 2)
+     Store batches failed: 0
    ```
 
 ## DB access
 
-- Library: `psycopg[binary]` (Prisma's Python client is immature; raw SQL is faster to write and more reliable here).
-- Connection string: `DATABASE_URL` from `src/dashboard/.env` — same Neon pooled URL the dashboard uses. Loaded via `python-dotenv` from a `.env` resolved by walking up from `src/zara/` to find the dashboard's `.env`. (Reason: there's only one Postgres in the project; we want one source of truth.)
-- All SQL is fully schema-qualified: `dashboard."Store"`, `dashboard."Review"`. Quotes are required because Prisma uses PascalCase table names.
-- Use a single connection per phase, autocommit off, commit at the end. Phase 3 wraps the whole load in one transaction so a partial failure rolls back cleanly.
+- **Library:** `psycopg[binary]` (Prisma's Python client is immature; raw SQL is faster to write and more reliable here).
+- **Connection string:** `DATABASE_URL` from `src/dashboard/.env` — same Neon pooled URL the dashboard uses. There is exactly one Postgres in the project; one source of truth.
+- **Resolution path** (explicit, not "walk up the tree"):
+  ```python
+  REPO_ROOT = Path(__file__).resolve().parents[4]   # .../BDD3-LICTER
+  DASHBOARD_ENV = REPO_ROOT / "src" / "dashboard" / ".env"
+  load_dotenv(DASHBOARD_ENV)
+  ```
+  `parents[4]` is verified for file `src/zara/scrapers/france/config.py`: `config.py → france → scrapers → zara → src → BDD3-LICTER`. If the module layout ever changes, this single line moves.
+- **SQL style:** fully schema-qualified, PascalCase table names quoted. `dashboard."Store"`, `dashboard."Review"`, `dashboard."Store".code`, etc.
+- **Transaction shape:** one `psycopg` connection for the whole Phase 3 run, `autocommit=False`, **commit per store** (see Phase 3 details). One bad store does not roll back the rest.
 
 ## CLI
 
 ```
 python -m zara.scrapers.france all                  # phases 1 + 2 + 3
 python -m zara.scrapers.france stores               # phase 1 only
+python -m zara.scrapers.france stores --dry-run     # phase 1, print counts + first 3, no JSONL write
 python -m zara.scrapers.france reviews              # phase 2 only
 python -m zara.scrapers.france reviews --limit 5    # phase 2, first 5 stores (test run)
 python -m zara.scrapers.france reviews --headless   # phase 2, headless Chrome (Loom / CI)
 python -m zara.scrapers.france load                 # phase 3 only
-python -m zara.scrapers.france load --dry-run       # print planned counts, no DB writes
+python -m zara.scrapers.france load --dry-run       # parse + clean, print planned counts, no DB writes
 ```
 
 `__main__.py` is a thin `argparse` dispatcher to the three phase modules.
@@ -271,14 +356,18 @@ python -m zara.scrapers.france load --dry-run       # print planned counts, no D
 ## Dependencies to add
 
 ```
-selenium
-webdriver-manager
+selenium>=4.6          # built-in Selenium Manager handles chromedriver
 psycopg[binary]
 python-dateutil
 langdetect
-python-dotenv          # already used by src/zara/cleaning/pipeline.py if present
-cuid                   # generate Prisma-compatible ids client-side
+python-dotenv
+cuid==0.4              # v1 cuid, matches Prisma's @default(cuid())
+requests               # Phase 1 primary path + Nominatim geocoder fallback
 ```
+
+Notes:
+- **No `webdriver-manager`**. Selenium 4.6+ has built-in Selenium Manager that resolves the chromedriver binary automatically — one less dependency.
+- **`cuid` (not `cuid2`)**. Verified against `src/dashboard/prisma/schema.prisma` which uses `@default(cuid())` (v1). If the Prisma schema is ever switched to `cuid2`, this dependency must switch in lockstep.
 
 These go in the project's existing `requirements.txt` at the repo root, not in `src/dashboard/` (which is a separate Node project).
 
@@ -292,7 +381,9 @@ These go in the project's existing `requirements.txt` at the repo root, not in `
 | CAPTCHA detected           | Screenshot, clean exit, JSONL preserved          | Wait, re-run phase 2 (resume)           |
 | Phase 1 endpoint changes   | Fallback to Selenium against the locator page    | Locator page still works                |
 | Phase 3 DB constraint hit  | Transaction rolls back, error printed            | Inspect, fix data or schema, re-run     |
-| Chromedriver version drift | `webdriver-manager` auto-updates                 | None needed                             |
+| Chromedriver version drift | Selenium Manager (built into Selenium 4.6+)      | None needed                             |
+| First-run consent wall     | `click_consent_if_present()` rejects all cookies  | Automatic; profile remembers the choice |
+| Geocoder failure (fallback)| Store dropped to `stores.errors.jsonl`            | Manual add, or accept missing store     |
 
 ## Testing
 
@@ -323,4 +414,4 @@ Once this scraper is in place and has populated `dashboard.Store` + `dashboard.R
 2. **Trend agent** can aggregate topics from sentiment output into `dashboard.Trend`.
 3. **Crisis-detection agent** can compare rolling sentiment windows and emit `dashboard.Alert` rows.
 4. The dashboard's seed data can be deleted in favor of real data (separate ticket).
-5. Same scraper structure can be cloned for other countries (`src/zara/scrapers/spain/`, `germany/`, …) by changing the `country` filter in Phase 1 and the search URL in Phase 2.
+5. Same scraper structure can be cloned for other countries (`src/zara/scrapers/spain/`, `germany/`, …). Note: cloning requires coordinated changes to (a) the `country` filter in Phase 1, (b) the Google Maps search URL locale (`google.com/maps` vs `google.es/maps`), (c) the `langdetect` target language in Phase 3, and (d) the consent-banner locale strings in `browser.py`. Not a pure Phase 1 tweak.
