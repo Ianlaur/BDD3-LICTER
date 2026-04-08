@@ -14,8 +14,8 @@ const COLORS: Record<string, string> = {
 
 export function SentimentDonut({ data }: Props) {
   return (
-    <div className="h-64 w-full">
-      <ResponsiveContainer width="100%" height="100%">
+    <div className="h-64 w-full min-w-0">
+      <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={220}>
         <PieChart>
           <Pie
             data={data}

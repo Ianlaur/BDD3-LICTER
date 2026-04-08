@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Moon, Sun } from "lucide-react";
+import { useState } from "react";
+import { Moon } from "lucide-react";
 
 type Theme = "light" | "dark";
 
@@ -27,15 +27,16 @@ function applyTheme(next: Theme) {
   }
 }
 
-export function ThemeToggle() {
-  const [theme, setTheme] = useState<Theme>("light");
+function resolveAndApplyInitialTheme(): Theme {
+  const initial = resolveTheme();
+  if (typeof window !== "undefined") {
+    applyTheme(initial);
+  }
+  return initial;
+}
 
-  useEffect(() => {
-    const synced = resolveTheme();
-    applyTheme(synced);
-    const raf = window.requestAnimationFrame(() => setTheme(synced));
-    return () => window.cancelAnimationFrame(raf);
-  }, []);
+export function ThemeToggle() {
+  const [theme, setTheme] = useState<Theme>(resolveAndApplyInitialTheme);
 
   function toggle() {
     setTheme((current) => {
@@ -53,14 +54,8 @@ export function ThemeToggle() {
       suppressHydrationWarning
       className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-900"
     >
-      {theme === "dark" ? (
-        <Sun className="h-4 w-4" />
-      ) : (
-        <Moon className="h-4 w-4" />
-      )}
-      <span suppressHydrationWarning>
-        {theme === "dark" ? "Light mode" : "Dark mode"}
-      </span>
+      <Moon className="h-4 w-4" />
+      <span suppressHydrationWarning>{theme === "dark" ? "Light mode" : "Dark mode"}</span>
     </button>
   );
 }

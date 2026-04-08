@@ -17,8 +17,8 @@ interface Props {
 
 export function CountryBar({ data }: Props) {
   return (
-    <div className="h-72 w-full">
-      <ResponsiveContainer width="100%" height="100%">
+    <div className="h-72 w-full min-w-0">
+      <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={240}>
         <BarChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
           <XAxis dataKey="country" tick={{ fontSize: 12 }} />
