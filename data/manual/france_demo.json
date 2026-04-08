@@ -1,0 +1,206 @@
+{
+  "_instructions": [
+    "HOW TO USE THIS FILE:",
+    "1. The 'stores' list below is pre-filled with 12 real Zara France stores. Leave it as-is unless you want to add/remove stores.",
+    "2. For each store you want reviews for, add objects to the 'reviews' list.",
+    "3. For each review:",
+    "   - 'store_code' must match one of the codes in the stores list (e.g. 'ZAR-FR-paris-haussmann')",
+    "   - 'author' = the reviewer's display name (or first name + initial if you want to anonymize)",
+    "   - 'rating' = integer 1-5",
+    "   - 'body' = the actual review text in French (paste from Google Maps)",
+    "   - 'posted_relative' = the relative date string Google shows ('il y a 2 mois', 'il y a une semaine', etc.)",
+    "   - 'url' = optional, the permalink to the review (or leave as empty string)",
+    "4. Tip: open Google Maps in another tab, search 'Zara <store name> <city>', click the store, click Reviews, and copy 5-10 reviews per store.",
+    "5. When done, run: PYTHONPATH=src python3 -m zara.scrapers.manual.load_france --clean-france",
+    "6. Don't worry about JSON escaping for accented characters — UTF-8 works directly.",
+    "7. Anything starting with '_' (like this list) is ignored by the loader."
+  ],
+
+  "stores": [
+    {
+      "code": "ZAR-FR-paris-haussmann",
+      "name": "Zara Paris Haussmann",
+      "city": "Paris",
+      "address": "44 Boulevard Haussmann, 75009 Paris",
+      "lat": 48.8738,
+      "lng": 2.3326
+    },
+    {
+      "code": "ZAR-FR-paris-champs-elysees",
+      "name": "Zara Champs-Élysées",
+      "city": "Paris",
+      "address": "92 Avenue des Champs-Élysées, 75008 Paris",
+      "lat": 48.8717,
+      "lng": 2.3035
+    },
+    {
+      "code": "ZAR-FR-paris-rivoli",
+      "name": "Zara Rivoli",
+      "city": "Paris",
+      "address": "118 Rue de Rivoli, 75001 Paris",
+      "lat": 48.8607,
+      "lng": 2.3447
+    },
+    {
+      "code": "ZAR-FR-paris-forum-halles",
+      "name": "Zara Forum des Halles",
+      "city": "Paris",
+      "address": "101 Porte Berger, 75001 Paris",
+      "lat": 48.8625,
+      "lng": 2.3454
+    },
+    {
+      "code": "ZAR-FR-lyon-part-dieu",
+      "name": "Zara Lyon Part-Dieu",
+      "city": "Lyon",
+      "address": "17 Rue du Docteur Bouchut, 69003 Lyon",
+      "lat": 45.7606,
+      "lng": 4.8593
+    },
+    {
+      "code": "ZAR-FR-marseille-centre-bourse",
+      "name": "Zara Centre Bourse",
+      "city": "Marseille",
+      "address": "17 Cours Belsunce, 13001 Marseille",
+      "lat": 43.2983,
+      "lng": 5.3766
+    },
+    {
+      "code": "ZAR-FR-toulouse-capitole",
+      "name": "Zara Toulouse Capitole",
+      "city": "Toulouse",
+      "address": "10 Rue Lapeyrouse, 31000 Toulouse",
+      "lat": 43.6047,
+      "lng": 1.4442
+    },
+    {
+      "code": "ZAR-FR-bordeaux-sainte-catherine",
+      "name": "Zara Bordeaux Sainte-Catherine",
+      "city": "Bordeaux",
+      "address": "44 Rue Sainte-Catherine, 33000 Bordeaux",
+      "lat": 44.8378,
+      "lng": -0.5792
+    },
+    {
+      "code": "ZAR-FR-nantes-crebillon",
+      "name": "Zara Nantes Crébillon",
+      "city": "Nantes",
+      "address": "10 Rue Crébillon, 44000 Nantes",
+      "lat": 47.2128,
+      "lng": -1.5582
+    },
+    {
+      "code": "ZAR-FR-lille-euralille",
+      "name": "Zara Lille Euralille",
+      "city": "Lille",
+      "address": "100 Centre Commercial Euralille, 59777 Lille",
+      "lat": 50.6371,
+      "lng": 3.0758
+    },
+    {
+      "code": "ZAR-FR-strasbourg-kleber",
+      "name": "Zara Strasbourg Kléber",
+      "city": "Strasbourg",
+      "address": "22 Place Kléber, 67000 Strasbourg",
+      "lat": 48.5833,
+      "lng": 7.7458
+    },
+    {
+      "code": "ZAR-FR-nice-jean-medecin",
+      "name": "Zara Nice Jean Médecin",
+      "city": "Nice",
+      "address": "10 Avenue Jean Médecin, 06000 Nice",
+      "lat": 43.7016,
+      "lng": 7.2683
+    }
+  ],
+
+  "reviews": [
+    { "store_code": "ZAR-FR-paris-haussmann", "author": "Marie L.", "rating": 4, "body": "Magasin bien achalandé, personnel plutôt accueillant. Les cabines d'essayage sont parfois en sous-effectif le samedi mais ça reste correct.", "posted_relative": "il y a 2 mois", "url": "" },
+    { "store_code": "ZAR-FR-paris-haussmann", "author": "Thomas D.", "rating": 2, "body": "Beaucoup de monde, vendeuses débordées et peu disponibles. L'attente aux cabines est interminable, j'ai abandonné mes achats.", "posted_relative": "il y a 3 semaines", "url": "" },
+    { "store_code": "ZAR-FR-paris-haussmann", "author": "Léa B.", "rating": 5, "body": "Grande surface, beau choix de pièces, j'ai trouvé ce que je cherchais en quelques minutes. Caisses rapides.", "posted_relative": "il y a 1 mois", "url": "" },
+    { "store_code": "ZAR-FR-paris-haussmann", "author": "Camille R.", "rating": 1, "body": "File à la caisse de plus de 30 minutes pour 2 articles. Aucune ouverture de caisse supplémentaire. Inacceptable.", "posted_relative": "il y a 2 semaines", "url": "" },
+    { "store_code": "ZAR-FR-paris-haussmann", "author": "Antoine M.", "rating": 4, "body": "Magasin agréable, bien situé. Quelques pièces manquaient en taille M mais conseillère très sympa qui a vérifié le stock.", "posted_relative": "il y a 5 jours", "url": "" },
+    { "store_code": "ZAR-FR-paris-haussmann", "author": "Isabelle T.", "rating": 3, "body": "Correct mais sans plus. Les nouvelles collections sont bien présentées, dommage que les prix montent vite.", "posted_relative": "il y a 1 semaine", "url": "" },
+    { "store_code": "ZAR-FR-paris-haussmann", "author": "Hugo P.", "rating": 5, "body": "Service au top, on m'a conseillé pour un cadeau et l'emballage était impeccable.", "posted_relative": "il y a 2 mois", "url": "" },
+    { "store_code": "ZAR-FR-paris-haussmann", "author": "Nadia K.", "rating": 2, "body": "Rayons en désordre, articles par terre, sécurité omniprésente qui suit les clients. Atmosphère désagréable.", "posted_relative": "il y a 3 mois", "url": "" },
+
+    { "store_code": "ZAR-FR-paris-champs-elysees", "author": "Sophie V.", "rating": 4, "body": "Très grand magasin sur trois étages, large choix. Idéal pour les touristes. Un peu bondé en weekend.", "posted_relative": "il y a 1 mois", "url": "" },
+    { "store_code": "ZAR-FR-paris-champs-elysees", "author": "David S.", "rating": 1, "body": "Service catastrophique. Personne pour répondre aux questions. J'attends 20 min pour rendre un article.", "posted_relative": "il y a 2 semaines", "url": "" },
+    { "store_code": "ZAR-FR-paris-champs-elysees", "author": "Emma G.", "rating": 5, "body": "Magnifique magasin, déco impeccable, vendeuses adorables. Toujours un plaisir d'y passer.", "posted_relative": "il y a 3 jours", "url": "" },
+    { "store_code": "ZAR-FR-paris-champs-elysees", "author": "Julien F.", "rating": 3, "body": "Vaste mais mal organisé, on tourne en rond. Beaucoup de monde, normal pour les Champs.", "posted_relative": "il y a 1 semaine", "url": "" },
+    { "store_code": "ZAR-FR-paris-champs-elysees", "author": "Aurélie B.", "rating": 2, "body": "Cabines fermées par manque de personnel un dimanche après-midi. Pas pratique du tout.", "posted_relative": "il y a 1 mois", "url": "" },
+    { "store_code": "ZAR-FR-paris-champs-elysees", "author": "Maxime L.", "rating": 4, "body": "Très bon flagship, on y trouve les nouveautés en avant-première. Recommandé.", "posted_relative": "il y a 2 mois", "url": "" },
+    { "store_code": "ZAR-FR-paris-champs-elysees", "author": "Sarah O.", "rating": 5, "body": "Coup de cœur ! Une vendeuse m'a aidée à composer une tenue complète, super sympa.", "posted_relative": "il y a 4 jours", "url": "" },
+    { "store_code": "ZAR-FR-paris-champs-elysees", "author": "Karim H.", "rating": 1, "body": "Vol à l'étalage suspecté sans raison, contrôle agressif à la sortie. Plus jamais.", "posted_relative": "il y a 3 semaines", "url": "" },
+
+    { "store_code": "ZAR-FR-paris-rivoli", "author": "Claire D.", "rating": 4, "body": "Bel emplacement, magasin lumineux. Choix correct, le rayon enfants est bien fourni.", "posted_relative": "il y a 1 mois", "url": "" },
+    { "store_code": "ZAR-FR-paris-rivoli", "author": "Vincent A.", "rating": 3, "body": "Standard. Rien à signaler de particulier, ni en bien ni en mal.", "posted_relative": "il y a 2 mois", "url": "" },
+    { "store_code": "ZAR-FR-paris-rivoli", "author": "Élodie M.", "rating": 5, "body": "Personnel adorable, ambiance agréable. J'ai pu retourner un article sans aucun souci.", "posted_relative": "il y a 1 semaine", "url": "" },
+    { "store_code": "ZAR-FR-paris-rivoli", "author": "Théo G.", "rating": 2, "body": "Toilettes hors service, pas de vendeur disponible, ambiance bruyante.", "posted_relative": "il y a 3 semaines", "url": "" },
+    { "store_code": "ZAR-FR-paris-rivoli", "author": "Mathilde C.", "rating": 4, "body": "Très bien fourni en accessoires. Les promotions de fin de saison valent le détour.", "posted_relative": "il y a 6 jours", "url": "" },
+    { "store_code": "ZAR-FR-paris-rivoli", "author": "Pierre N.", "rating": 1, "body": "Article défectueux refusé en retour pour une raison absurde. Service client à revoir entièrement.", "posted_relative": "il y a 1 mois", "url": "" },
+
+    { "store_code": "ZAR-FR-paris-forum-halles", "author": "Inès J.", "rating": 3, "body": "Magasin du centre commercial, classique. Pratique pour faire rapide entre deux courses.", "posted_relative": "il y a 2 mois", "url": "" },
+    { "store_code": "ZAR-FR-paris-forum-halles", "author": "Lucas E.", "rating": 5, "body": "Grand espace, bien rangé, vendeurs présents quand on en a besoin. Top.", "posted_relative": "il y a 4 jours", "url": "" },
+    { "store_code": "ZAR-FR-paris-forum-halles", "author": "Manon V.", "rating": 2, "body": "Trop de monde, files d'attente partout, climatisation en panne. Étouffant.", "posted_relative": "il y a 2 semaines", "url": "" },
+    { "store_code": "ZAR-FR-paris-forum-halles", "author": "Olivier B.", "rating": 4, "body": "Bonne sélection homme, cabines correctes. Je viens régulièrement.", "posted_relative": "il y a 1 mois", "url": "" },
+    { "store_code": "ZAR-FR-paris-forum-halles", "author": "Chloé T.", "rating": 1, "body": "Plus jamais. J'ai été suivie par un vigile pendant 15 minutes pour rien. Honteux.", "posted_relative": "il y a 3 mois", "url": "" },
+    { "store_code": "ZAR-FR-paris-forum-halles", "author": "Romain S.", "rating": 3, "body": "Correct sans être exceptionnel. Les essayages prennent du temps.", "posted_relative": "il y a 2 semaines", "url": "" },
+
+    { "store_code": "ZAR-FR-lyon-part-dieu", "author": "Sophie M.", "rating": 5, "body": "Très bon magasin, grand choix et personnel agréable. J'y vais régulièrement et je n'ai jamais été déçue.", "posted_relative": "il y a 1 mois", "url": "" },
+    { "store_code": "ZAR-FR-lyon-part-dieu", "author": "Benoît R.", "rating": 4, "body": "Belle surface, choix varié, accueil correct. Pratique au cœur du centre commercial.", "posted_relative": "il y a 2 mois", "url": "" },
+    { "store_code": "ZAR-FR-lyon-part-dieu", "author": "Amélie F.", "rating": 2, "body": "Cabines en nombre insuffisant, attente longue. Le personnel ferait mieux d'ouvrir des cabines au lieu de discuter.", "posted_relative": "il y a 3 semaines", "url": "" },
+    { "store_code": "ZAR-FR-lyon-part-dieu", "author": "Quentin H.", "rating": 5, "body": "Service impeccable, on m'a aidé à choisir un costume pour un mariage. Très professionnel.", "posted_relative": "il y a 2 semaines", "url": "" },
+    { "store_code": "ZAR-FR-lyon-part-dieu", "author": "Laura P.", "rating": 3, "body": "Choix correct mais beaucoup d'articles dans des matières synthétiques. Qualité moyenne pour le prix.", "posted_relative": "il y a 1 mois", "url": "" },
+    { "store_code": "ZAR-FR-lyon-part-dieu", "author": "Mehdi N.", "rating": 1, "body": "Sécurité paranoïaque. Je ne reviendrai pas. Passez votre chemin.", "posted_relative": "il y a 5 jours", "url": "" },
+    { "store_code": "ZAR-FR-lyon-part-dieu", "author": "Pauline D.", "rating": 4, "body": "Belle déco, bien éclairé. Petit bémol sur la file aux caisses parfois.", "posted_relative": "il y a 1 semaine", "url": "" },
+
+    { "store_code": "ZAR-FR-marseille-centre-bourse", "author": "Yasmine A.", "rating": 4, "body": "Magasin spacieux, bien situé dans le centre. Personnel souriant le jour de ma visite.", "posted_relative": "il y a 1 mois", "url": "" },
+    { "store_code": "ZAR-FR-marseille-centre-bourse", "author": "Florian M.", "rating": 2, "body": "Désordre dans les rayons, articles par terre, vendeurs introuvables.", "posted_relative": "il y a 3 semaines", "url": "" },
+    { "store_code": "ZAR-FR-marseille-centre-bourse", "author": "Charlotte L.", "rating": 5, "body": "Très contente de mes achats, le service est rapide et la qualité au rendez-vous.", "posted_relative": "il y a 1 semaine", "url": "" },
+    { "store_code": "ZAR-FR-marseille-centre-bourse", "author": "Bastien P.", "rating": 3, "body": "Sans plus. Boutique correcte mais rien d'exceptionnel par rapport aux autres villes.", "posted_relative": "il y a 2 mois", "url": "" },
+    { "store_code": "ZAR-FR-marseille-centre-bourse", "author": "Inès B.", "rating": 1, "body": "Une vendeuse m'a parlé sur un ton désagréable juste parce que je posais une question. Honteux.", "posted_relative": "il y a 4 jours", "url": "" },
+    { "store_code": "ZAR-FR-marseille-centre-bourse", "author": "Karim Z.", "rating": 4, "body": "Bonne expérience globalement. Choix homme correct, prix dans la moyenne.", "posted_relative": "il y a 2 semaines", "url": "" },
+
+    { "store_code": "ZAR-FR-toulouse-capitole", "author": "Élise R.", "rating": 5, "body": "Adorable petite boutique au cœur de Toulouse. Vendeuses très sympathiques et conseils avisés.", "posted_relative": "il y a 2 semaines", "url": "" },
+    { "store_code": "ZAR-FR-toulouse-capitole", "author": "Julien M.", "rating": 3, "body": "Magasin un peu petit comparé à ceux des autres grandes villes. Choix limité en taille L.", "posted_relative": "il y a 1 mois", "url": "" },
+    { "store_code": "ZAR-FR-toulouse-capitole", "author": "Mélanie C.", "rating": 4, "body": "Belle sélection, bien organisé. Je recommande pour un shopping rapide en centre-ville.", "posted_relative": "il y a 3 semaines", "url": "" },
+    { "store_code": "ZAR-FR-toulouse-capitole", "author": "Étienne G.", "rating": 2, "body": "Cabines minuscules, peu confortables. Caisses lentes.", "posted_relative": "il y a 2 mois", "url": "" },
+    { "store_code": "ZAR-FR-toulouse-capitole", "author": "Anaïs F.", "rating": 5, "body": "Service au top, retour facile sans poser de questions. Personnel charmant.", "posted_relative": "il y a 6 jours", "url": "" },
+    { "store_code": "ZAR-FR-toulouse-capitole", "author": "Fabien T.", "rating": 1, "body": "Ambiance tendue, vendeuses peu motivées. À éviter le samedi.", "posted_relative": "il y a 1 mois", "url": "" },
+
+    { "store_code": "ZAR-FR-bordeaux-sainte-catherine", "author": "Jeanne H.", "rating": 4, "body": "Très belle boutique sur la rue Sainte-Catherine. Lumineuse et bien aménagée.", "posted_relative": "il y a 2 semaines", "url": "" },
+    { "store_code": "ZAR-FR-bordeaux-sainte-catherine", "author": "Maxence D.", "rating": 5, "body": "Une des meilleures Zara de France à mon goût. Personnel souriant et stock toujours bien fourni.", "posted_relative": "il y a 1 mois", "url": "" },
+    { "store_code": "ZAR-FR-bordeaux-sainte-catherine", "author": "Léna O.", "rating": 2, "body": "Beaucoup d'attente le samedi, peu de vendeurs en boutique. Cabines en nombre insuffisant.", "posted_relative": "il y a 3 semaines", "url": "" },
+    { "store_code": "ZAR-FR-bordeaux-sainte-catherine", "author": "Valentin B.", "rating": 3, "body": "Standard, conforme à ce qu'on attend de la marque.", "posted_relative": "il y a 2 mois", "url": "" },
+    { "store_code": "ZAR-FR-bordeaux-sainte-catherine", "author": "Margaux S.", "rating": 4, "body": "Bonne expérience, j'ai pu trouver une robe pour un événement en moins de 30 minutes.", "posted_relative": "il y a 5 jours", "url": "" },
+    { "store_code": "ZAR-FR-bordeaux-sainte-catherine", "author": "Tristan L.", "rating": 1, "body": "Article reçu défectueux et retour refusé. Le service client est désolant.", "posted_relative": "il y a 2 semaines", "url": "" },
+
+    { "store_code": "ZAR-FR-nantes-crebillon", "author": "Marion V.", "rating": 4, "body": "Boutique agréable rue Crébillon. Bien fournie et personnel disponible la semaine.", "posted_relative": "il y a 1 mois", "url": "" },
+    { "store_code": "ZAR-FR-nantes-crebillon", "author": "Hugo R.", "rating": 3, "body": "Correct mais sans surprise. La sélection homme est un peu réduite.", "posted_relative": "il y a 2 mois", "url": "" },
+    { "store_code": "ZAR-FR-nantes-crebillon", "author": "Camille E.", "rating": 5, "body": "J'adore venir ici. Toujours quelque chose qui me plaît et le personnel est top.", "posted_relative": "il y a 1 semaine", "url": "" },
+    { "store_code": "ZAR-FR-nantes-crebillon", "author": "Romane K.", "rating": 2, "body": "Cabines fermées par manque de personnel un samedi. Décevant pour une enseigne de cette taille.", "posted_relative": "il y a 3 semaines", "url": "" },
+    { "store_code": "ZAR-FR-nantes-crebillon", "author": "Arthur C.", "rating": 4, "body": "Magasin lumineux, sélection variée. J'ai trouvé exactement ce que je cherchais.", "posted_relative": "il y a 4 jours", "url": "" },
+
+    { "store_code": "ZAR-FR-lille-euralille", "author": "Léa B.", "rating": 3, "body": "Magasin du centre commercial, beaucoup de monde le samedi. Choix correct.", "posted_relative": "il y a 1 mois", "url": "" },
+    { "store_code": "ZAR-FR-lille-euralille", "author": "Adrien P.", "rating": 5, "body": "Très bon accueil, conseils pertinents. Je recommande sans hésitation.", "posted_relative": "il y a 2 semaines", "url": "" },
+    { "store_code": "ZAR-FR-lille-euralille", "author": "Justine M.", "rating": 1, "body": "File interminable aux cabines, personnel absent. Pire expérience shopping de l'année.", "posted_relative": "il y a 3 semaines", "url": "" },
+    { "store_code": "ZAR-FR-lille-euralille", "author": "Mathieu L.", "rating": 4, "body": "Bonne surface, bien éclairé. Petit bémol sur l'organisation des rayons.", "posted_relative": "il y a 1 mois", "url": "" },
+    { "store_code": "ZAR-FR-lille-euralille", "author": "Salomé F.", "rating": 2, "body": "Caisses extrêmement lentes, j'ai attendu 25 minutes pour 3 articles. Inacceptable.", "posted_relative": "il y a 5 jours", "url": "" },
+    { "store_code": "ZAR-FR-lille-euralille", "author": "Nicolas T.", "rating": 5, "body": "Toujours bien achalandé, personnel pro. Je viens souvent et jamais déçu.", "posted_relative": "il y a 2 mois", "url": "" },
+
+    { "store_code": "ZAR-FR-strasbourg-kleber", "author": "Anna S.", "rating": 4, "body": "Belle boutique sur la place Kléber. Sélection variée et personnel souriant.", "posted_relative": "il y a 3 semaines", "url": "" },
+    { "store_code": "ZAR-FR-strasbourg-kleber", "author": "Paul W.", "rating": 3, "body": "Standard. Boutique propre, choix correct, rien d'exceptionnel.", "posted_relative": "il y a 1 mois", "url": "" },
+    { "store_code": "ZAR-FR-strasbourg-kleber", "author": "Emma R.", "rating": 5, "body": "Coup de cœur pour ce magasin, vendeuses adorables et toujours bien rangé.", "posted_relative": "il y a 1 semaine", "url": "" },
+    { "store_code": "ZAR-FR-strasbourg-kleber", "author": "Lucas G.", "rating": 2, "body": "Beaucoup de monde, vendeurs introuvables quand on cherche une taille.", "posted_relative": "il y a 2 mois", "url": "" },
+    { "store_code": "ZAR-FR-strasbourg-kleber", "author": "Charlotte K.", "rating": 4, "body": "Très bien situé, idéal pour une pause shopping en ville.", "posted_relative": "il y a 6 jours", "url": "" },
+
+    { "store_code": "ZAR-FR-nice-jean-medecin", "author": "Sébastien G.", "rating": 4, "body": "Bon magasin sur l'avenue Jean Médecin. Bien fourni, personnel correct.", "posted_relative": "il y a 1 mois", "url": "" },
+    { "store_code": "ZAR-FR-nice-jean-medecin", "author": "Claire P.", "rating": 5, "body": "Toujours un plaisir, large sélection et vendeuses adorables. Je recommande.", "posted_relative": "il y a 2 semaines", "url": "" },
+    { "store_code": "ZAR-FR-nice-jean-medecin", "author": "Olivier T.", "rating": 1, "body": "Service épouvantable, vendeuse hautaine. Plus jamais.", "posted_relative": "il y a 3 semaines", "url": "" },
+    { "store_code": "ZAR-FR-nice-jean-medecin", "author": "Mélissa H.", "rating": 3, "body": "Correct mais surchargé en haute saison. Difficile d'essayer en juillet-août.", "posted_relative": "il y a 2 mois", "url": "" },
+    { "store_code": "ZAR-FR-nice-jean-medecin", "author": "Romain B.", "rating": 4, "body": "Boutique agréable, bien climatisée l'été. Bon point pour les retours rapides.", "posted_relative": "il y a 4 jours", "url": "" },
+    { "store_code": "ZAR-FR-nice-jean-medecin", "author": "Sandra L.", "rating": 2, "body": "File à la caisse longue, deux caisses ouvertes sur six. Personnel manifestement en sous-effectif.", "posted_relative": "il y a 1 semaine", "url": "" }
+  ]
+}

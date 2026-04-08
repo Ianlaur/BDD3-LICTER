@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { getStoresWithSignals } from "@/lib/data";
@@ -39,13 +40,15 @@ export default async function StoresPage() {
                 {sorted.map((s) => (
                   <tr
                     key={s.id}
-                    className="border-b border-neutral-100 last:border-none dark:border-neutral-800"
+                    className="border-b border-neutral-100 transition-colors last:border-none hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-900"
                   >
                     <td className="px-6 py-4">
-                      <div className="font-medium">{s.name}</div>
-                      <div className="text-xs text-neutral-500">
-                        {s.city} · {s.code}
-                      </div>
+                      <Link href={`/stores/${s.code}`} className="block">
+                        <div className="font-medium hover:underline">{s.name}</div>
+                        <div className="text-xs text-neutral-500">
+                          {s.city} · {s.code}
+                        </div>
+                      </Link>
                     </td>
                     <td className="px-6 py-4 text-neutral-600 dark:text-neutral-400">{s.country}</td>
                     <td className="px-6 py-4 text-right tabular-nums">{s.reviewCount}</td>
