@@ -1,0 +1,160 @@
+{
+  "_comment": "Synthetic but plausible Zara product catalogue + multi-source reviews for the /products dashboard page. Generated for the BDD3 demo. Loaded by src/zara/scrapers/manual/load_products.py.",
+
+  "products": [
+    {
+      "code": "ZAR-PRD-jean-straight-01",
+      "name": "High-Waist Straight-Leg Jean",
+      "category": "bottoms",
+      "color": "#4a6fa5",
+      "priceEur": 39.95,
+      "description": "The denim workhorse of the collection. Mid-blue wash, 100% cotton, no stretch."
+    },
+    {
+      "code": "ZAR-PRD-blazer-oversized-01",
+      "name": "Oversized Wool-Blend Blazer",
+      "category": "outerwear",
+      "color": "#2c2c2c",
+      "priceEur": 89.95,
+      "description": "Boxy cut, double-breasted, padded shoulders. The TikTok-famous power-dressing piece."
+    },
+    {
+      "code": "ZAR-PRD-puffer-cropped-01",
+      "name": "Cropped Quilted Puffer",
+      "category": "outerwear",
+      "color": "#c0c0c0",
+      "priceEur": 69.95,
+      "description": "Water-repellent shell, recycled fill, hits at the waist."
+    },
+    {
+      "code": "ZAR-PRD-shirt-linen-01",
+      "name": "Linen-Blend Oversized Shirt",
+      "category": "tops",
+      "color": "#f5f5dc",
+      "priceEur": 29.95,
+      "description": "55% linen, 45% viscose. Drop-shoulder, mother-of-pearl buttons."
+    },
+    {
+      "code": "ZAR-PRD-dress-slip-01",
+      "name": "Satin Midi Slip Dress",
+      "category": "dresses",
+      "color": "#8b0000",
+      "priceEur": 45.95,
+      "description": "Bias-cut satin, adjustable straps, side split. A bestseller every season."
+    },
+    {
+      "code": "ZAR-PRD-sneaker-chunky-01",
+      "name": "Chunky Sole Sneakers",
+      "category": "shoes",
+      "color": "#ffffff",
+      "priceEur": 49.95,
+      "description": "Synthetic upper, 5 cm platform sole, lace-up."
+    },
+    {
+      "code": "ZAR-PRD-bag-tote-01",
+      "name": "Structured Leather-Effect Tote",
+      "category": "accessories",
+      "color": "#8b4513",
+      "priceEur": 35.95,
+      "description": "Polyurethane, magnetic closure, fits a 13-inch laptop."
+    },
+    {
+      "code": "ZAR-PRD-knit-cable-01",
+      "name": "Cable-Knit Crew Sweater",
+      "category": "tops",
+      "color": "#d2b48c",
+      "priceEur": 45.95,
+      "description": "Wool-blend, ribbed cuffs and hem, relaxed fit."
+    }
+  ],
+
+  "reviews": [
+    { "product_code": "ZAR-PRD-jean-straight-01", "source": "google_merchant", "author": "Sophie L.", "rating": 4, "body": "La coupe tombe bien, taille conforme. Couleur fidèle à la photo. Un peu rigide au premier lavage mais s'assouplit vite.", "posted_relative": "il y a 2 semaines" },
+    { "product_code": "ZAR-PRD-jean-straight-01", "source": "google_merchant", "author": "Marie D.", "rating": 5, "body": "Enfin un jean droit qui ne se déforme pas aux genoux. Je l'ai pris en deux couleurs.", "posted_relative": "il y a 1 mois" },
+    { "product_code": "ZAR-PRD-jean-straight-01", "source": "trustpilot", "author": "Camille R.", "rating": 2, "body": "Décousu à l'intérieur dès la première semaine. Qualité en chute libre chez Zara ces derniers temps.", "posted_relative": "il y a 3 semaines" },
+    { "product_code": "ZAR-PRD-jean-straight-01", "source": "trustpilot", "author": "Julie M.", "rating": 3, "body": "Taille haute vraiment haute, attention. Ça fait bizarre au début. Tissu correct pour le prix.", "posted_relative": "il y a 1 mois" },
+    { "product_code": "ZAR-PRD-jean-straight-01", "source": "instagram", "author": "@parisienne.style", "rating": 5, "body": "Le jean parfait pour un look minimaliste ! Je le porte avec tout. #zarahaul", "posted_relative": "il y a 5 jours" },
+    { "product_code": "ZAR-PRD-jean-straight-01", "source": "instagram", "author": "@modelyonnaise", "rating": 4, "body": "Très bonne coupe pour celles qui ont des hanches. Rare chez Zara.", "posted_relative": "il y a 2 semaines" },
+    { "product_code": "ZAR-PRD-jean-straight-01", "source": "tiktok", "author": "@fashionbudget", "rating": 4, "body": "40 euros pour un jean qui ressemble à du Levi's, je prends. Review complète en bio.", "posted_relative": "il y a 1 semaine" },
+    { "product_code": "ZAR-PRD-jean-straight-01", "source": "tiktok", "author": "@zarahaulqueen", "rating": 3, "body": "Mignon mais le tissu est plus fin que sur les photos. Un peu déçue.", "posted_relative": "il y a 3 jours" },
+    { "product_code": "ZAR-PRD-jean-straight-01", "source": "reddit", "author": "u/FemmeFashion", "rating": 4, "body": "Finally a Zara jean that doesn't stretch out after one wear. Sticking with these.", "posted_relative": "il y a 2 semaines" },
+    { "product_code": "ZAR-PRD-jean-straight-01", "source": "reddit", "author": "u/minimaliste_fr", "rating": 5, "body": "Coupe droite classique, rien à redire. Le tissu tient bien dans le temps.", "posted_relative": "il y a 1 mois" },
+
+    { "product_code": "ZAR-PRD-blazer-oversized-01", "source": "google_merchant", "author": "Élise B.", "rating": 5, "body": "LE blazer de la saison. Structure parfaite, épaules bien marquées. J'ai reçu 5 compliments en une journée.", "posted_relative": "il y a 1 semaine" },
+    { "product_code": "ZAR-PRD-blazer-oversized-01", "source": "google_merchant", "author": "Anaïs P.", "rating": 4, "body": "Très belle coupe mais prévoir une taille en dessous, il taille vraiment grand.", "posted_relative": "il y a 3 semaines" },
+    { "product_code": "ZAR-PRD-blazer-oversized-01", "source": "trustpilot", "author": "Clémence V.", "rating": 2, "body": "Doublure qui gratte, couture des manches déjà défaite au bout de 3 utilisations. Renvoyé.", "posted_relative": "il y a 2 semaines" },
+    { "product_code": "ZAR-PRD-blazer-oversized-01", "source": "trustpilot", "author": "Laura T.", "rating": 5, "body": "Investissement parfait pour le bureau. Tombé impeccable, se froisse peu.", "posted_relative": "il y a 1 mois" },
+    { "product_code": "ZAR-PRD-blazer-oversized-01", "source": "instagram", "author": "@officelookfr", "rating": 5, "body": "Le blazer que tout le monde veut sur Instagram en ce moment. Enfin je l'ai !", "posted_relative": "il y a 4 jours" },
+    { "product_code": "ZAR-PRD-blazer-oversized-01", "source": "instagram", "author": "@bymelodie", "rating": 5, "body": "On dirait du Saint Laurent à 90 euros. Obsédée.", "posted_relative": "il y a 1 semaine" },
+    { "product_code": "ZAR-PRD-blazer-oversized-01", "source": "tiktok", "author": "@powerdressing", "rating": 4, "body": "Attention à la taille, je recommande de descendre d'une taille. Sinon magnifique.", "posted_relative": "il y a 6 jours" },
+    { "product_code": "ZAR-PRD-blazer-oversized-01", "source": "tiktok", "author": "@corpoqueen", "rating": 5, "body": "CEO vibes. Le blazer parfait pour les réunions importantes.", "posted_relative": "il y a 2 semaines" },
+    { "product_code": "ZAR-PRD-blazer-oversized-01", "source": "reddit", "author": "u/workwardrobe", "rating": 3, "body": "Looks great but started pilling after one week. Fabric feels cheap up close.", "posted_relative": "il y a 3 semaines" },
+    { "product_code": "ZAR-PRD-blazer-oversized-01", "source": "reddit", "author": "u/parisgirl92", "rating": 5, "body": "Bought it after seeing it everywhere on TFTok. Worth the hype.", "posted_relative": "il y a 1 mois" },
+
+    { "product_code": "ZAR-PRD-puffer-cropped-01", "source": "google_merchant", "author": "Manon G.", "rating": 3, "body": "Correct pour le prix mais le garnissage se tasse déjà au bout de quelques jours.", "posted_relative": "il y a 2 semaines" },
+    { "product_code": "ZAR-PRD-puffer-cropped-01", "source": "google_merchant", "author": "Léa H.", "rating": 4, "body": "Coupe cropped parfaite avec une taille haute. Pas la plus chaude mais mignonne.", "posted_relative": "il y a 1 mois" },
+    { "product_code": "ZAR-PRD-puffer-cropped-01", "source": "trustpilot", "author": "Emma S.", "rating": 1, "body": "Fermeture éclair cassée à la deuxième utilisation. SAV catastrophique, remboursement refusé.", "posted_relative": "il y a 3 semaines" },
+    { "product_code": "ZAR-PRD-puffer-cropped-01", "source": "trustpilot", "author": "Céline F.", "rating": 3, "body": "Esthétique au top mais vraiment pas adapté à l'hiver. C'est une doudoune de mi-saison.", "posted_relative": "il y a 2 semaines" },
+    { "product_code": "ZAR-PRD-puffer-cropped-01", "source": "instagram", "author": "@winteroutfits", "rating": 4, "body": "Super pour un look streetwear. Je la porte avec un hoodie dessous.", "posted_relative": "il y a 1 semaine" },
+    { "product_code": "ZAR-PRD-puffer-cropped-01", "source": "instagram", "author": "@stylefrancaise", "rating": 5, "body": "Coupe cropped à tomber. Je la mets H24.", "posted_relative": "il y a 3 jours" },
+    { "product_code": "ZAR-PRD-puffer-cropped-01", "source": "tiktok", "author": "@winterhauls", "rating": 2, "body": "Bof. La doudoune fait cheap en vrai, rien à voir avec les photos du site.", "posted_relative": "il y a 1 semaine" },
+    { "product_code": "ZAR-PRD-puffer-cropped-01", "source": "tiktok", "author": "@basicsgirl", "rating": 4, "body": "Parfaite pour le printemps. Trop fine pour janvier/février par contre.", "posted_relative": "il y a 2 semaines" },
+    { "product_code": "ZAR-PRD-puffer-cropped-01", "source": "reddit", "author": "u/coldweatherchic", "rating": 2, "body": "Not warm at all. Stick with Uniqlo for actual winter coats.", "posted_relative": "il y a 3 semaines" },
+    { "product_code": "ZAR-PRD-puffer-cropped-01", "source": "reddit", "author": "u/budgetstyle", "rating": 4, "body": "Cute for photos, works if you layer underneath. Can't beat the price.", "posted_relative": "il y a 1 mois" },
+
+    { "product_code": "ZAR-PRD-shirt-linen-01", "source": "google_merchant", "author": "Valentine O.", "rating": 5, "body": "Le tissu est vraiment agréable, le lin se reconnait. Parfait pour l'été.", "posted_relative": "il y a 2 semaines" },
+    { "product_code": "ZAR-PRD-shirt-linen-01", "source": "google_merchant", "author": "Lucie A.", "rating": 4, "body": "Très aéré, idéal par forte chaleur. Se froisse vraiment beaucoup par contre.", "posted_relative": "il y a 3 semaines" },
+    { "product_code": "ZAR-PRD-shirt-linen-01", "source": "trustpilot", "author": "Pauline N.", "rating": 3, "body": "Chemise correcte mais on voit à travers, il faut un top dessous. Pas prévu pour le prix.", "posted_relative": "il y a 1 mois" },
+    { "product_code": "ZAR-PRD-shirt-linen-01", "source": "trustpilot", "author": "Océane J.", "rating": 5, "body": "J'adore cette chemise, je l'ai prise en deux coloris. Coupe oversized parfaite.", "posted_relative": "il y a 2 semaines" },
+    { "product_code": "ZAR-PRD-shirt-linen-01", "source": "instagram", "author": "@summerlook", "rating": 5, "body": "Mon essentiel de l'été. Lin léger, coupe oversize, j'adore.", "posted_relative": "il y a 1 semaine" },
+    { "product_code": "ZAR-PRD-shirt-linen-01", "source": "instagram", "author": "@vacationwardrobe", "rating": 4, "body": "Parfaite pour les vacances. Froisse beaucoup mais ça fait partie du charme.", "posted_relative": "il y a 5 jours" },
+    { "product_code": "ZAR-PRD-shirt-linen-01", "source": "tiktok", "author": "@ootdparis", "rating": 4, "body": "45% viscose c'est pas du vrai lin donc attention. Mais ça reste jolie.", "posted_relative": "il y a 1 semaine" },
+    { "product_code": "ZAR-PRD-shirt-linen-01", "source": "tiktok", "author": "@frenchgirlstyle", "rating": 5, "body": "Le style French girl pour pas cher. Je recommande.", "posted_relative": "il y a 3 jours" },
+    { "product_code": "ZAR-PRD-shirt-linen-01", "source": "reddit", "author": "u/linenlover", "rating": 3, "body": "It's mostly viscose, just FYI. Still breathable enough for summer though.", "posted_relative": "il y a 3 semaines" },
+    { "product_code": "ZAR-PRD-shirt-linen-01", "source": "reddit", "author": "u/capsulewardrobe", "rating": 4, "body": "Good summer staple. Wrinkles like crazy but that's linen for you.", "posted_relative": "il y a 1 mois" },
+
+    { "product_code": "ZAR-PRD-dress-slip-01", "source": "google_merchant", "author": "Chloé M.", "rating": 5, "body": "Robe sublime, tombé parfait. Je l'ai portée à un mariage, beaucoup de compliments.", "posted_relative": "il y a 1 semaine" },
+    { "product_code": "ZAR-PRD-dress-slip-01", "source": "google_merchant", "author": "Inès K.", "rating": 4, "body": "Coupe très flatteuse. Attention les bretelles sont fines, prévoir un soutien-gorge spécifique.", "posted_relative": "il y a 2 semaines" },
+    { "product_code": "ZAR-PRD-dress-slip-01", "source": "trustpilot", "author": "Sarah W.", "rating": 2, "body": "Satin très fragile, il s'accroche à tout. Un petit fil de tiré au bout de 2 heures.", "posted_relative": "il y a 3 semaines" },
+    { "product_code": "ZAR-PRD-dress-slip-01", "source": "trustpilot", "author": "Margaux D.", "rating": 5, "body": "Ma robe préférée de l'année. Tombé magnifique, couleur bordeaux profonde.", "posted_relative": "il y a 1 mois" },
+    { "product_code": "ZAR-PRD-dress-slip-01", "source": "instagram", "author": "@romanticstyle", "rating": 5, "body": "Cette robe est un rêve. Satin magnifique, coupe bias parfaite.", "posted_relative": "il y a 4 jours" },
+    { "product_code": "ZAR-PRD-dress-slip-01", "source": "instagram", "author": "@eveningwear", "rating": 4, "body": "Look de luxe pour 45 euros, difficile de résister.", "posted_relative": "il y a 1 semaine" },
+    { "product_code": "ZAR-PRD-dress-slip-01", "source": "tiktok", "author": "@datelook", "rating": 5, "body": "LA robe pour un rdv important. Je suis obsédée par la couleur.", "posted_relative": "il y a 3 jours" },
+    { "product_code": "ZAR-PRD-dress-slip-01", "source": "tiktok", "author": "@zaradupes", "rating": 4, "body": "On dirait du Reformation. Pour le prix c'est imbattable.", "posted_relative": "il y a 6 jours" },
+    { "product_code": "ZAR-PRD-dress-slip-01", "source": "reddit", "author": "u/slipdresslover", "rating": 3, "body": "Beautiful but the satin shows every single wrinkle and snag. Handle with care.", "posted_relative": "il y a 2 semaines" },
+    { "product_code": "ZAR-PRD-dress-slip-01", "source": "reddit", "author": "u/eveningchic", "rating": 5, "body": "Wore this to a gala, got so many compliments. Bias cut is gorgeous.", "posted_relative": "il y a 1 mois" },
+
+    { "product_code": "ZAR-PRD-sneaker-chunky-01", "source": "google_merchant", "author": "Hugo V.", "rating": 3, "body": "Le style y est mais la semelle commence à se décoller au bout de deux semaines. Décevant.", "posted_relative": "il y a 2 semaines" },
+    { "product_code": "ZAR-PRD-sneaker-chunky-01", "source": "google_merchant", "author": "Thomas L.", "rating": 4, "body": "Bonne allure, confortable. Faut juste bien les entretenir, le blanc se salit vite.", "posted_relative": "il y a 3 semaines" },
+    { "product_code": "ZAR-PRD-sneaker-chunky-01", "source": "trustpilot", "author": "Romain C.", "rating": 1, "body": "Catastrophique. Semelle décollée au bout de 10 jours. Refus de remboursement. Plus jamais Zara pour les chaussures.", "posted_relative": "il y a 1 mois" },
+    { "product_code": "ZAR-PRD-sneaker-chunky-01", "source": "trustpilot", "author": "Mathilde E.", "rating": 4, "body": "Confort correct, style sympa. Prévoir une pointure au-dessus, elles taillent petit.", "posted_relative": "il y a 2 semaines" },
+    { "product_code": "ZAR-PRD-sneaker-chunky-01", "source": "instagram", "author": "@sneakerstyle", "rating": 4, "body": "Look chunky à prix mini. Mon combo préféré avec un jean large.", "posted_relative": "il y a 1 semaine" },
+    { "product_code": "ZAR-PRD-sneaker-chunky-01", "source": "instagram", "author": "@trendyfeet", "rating": 5, "body": "On dirait du Balenciaga à 50 euros. Je prends.", "posted_relative": "il y a 5 jours" },
+    { "product_code": "ZAR-PRD-sneaker-chunky-01", "source": "tiktok", "author": "@shoehaul", "rating": 2, "body": "Elles sont jolies mais tiennent pas, franchement investissez dans un vrai Nike.", "posted_relative": "il y a 2 semaines" },
+    { "product_code": "ZAR-PRD-sneaker-chunky-01", "source": "tiktok", "author": "@streetwearfr", "rating": 4, "body": "Pour le style c'est parfait. Pour marcher longtemps, c'est autre chose.", "posted_relative": "il y a 1 semaine" },
+    { "product_code": "ZAR-PRD-sneaker-chunky-01", "source": "reddit", "author": "u/shoequality", "rating": 1, "body": "Fell apart in 3 weeks. Zara shoes are always a disaster. Never again.", "posted_relative": "il y a 3 semaines" },
+    { "product_code": "ZAR-PRD-sneaker-chunky-01", "source": "reddit", "author": "u/chunkytrend", "rating": 3, "body": "Cute but cheap construction. Fine for occasional wear, not daily.", "posted_relative": "il y a 1 mois" },
+
+    { "product_code": "ZAR-PRD-bag-tote-01", "source": "google_merchant", "author": "Alice R.", "rating": 4, "body": "Très beau sac, on dirait du vrai cuir. Un peu rigide au début mais se détend.", "posted_relative": "il y a 2 semaines" },
+    { "product_code": "ZAR-PRD-bag-tote-01", "source": "google_merchant", "author": "Juliette B.", "rating": 5, "body": "Parfait pour le bureau, mon MacBook 13 rentre nickel. Couleur marron sublime.", "posted_relative": "il y a 3 semaines" },
+    { "product_code": "ZAR-PRD-bag-tote-01", "source": "trustpilot", "author": "Nadia M.", "rating": 2, "body": "L'anse a commencé à se fissurer après 1 mois d'utilisation quotidienne. Pas durable.", "posted_relative": "il y a 1 mois" },
+    { "product_code": "ZAR-PRD-bag-tote-01", "source": "trustpilot", "author": "Estelle P.", "rating": 4, "body": "Joli sac, structure impeccable, bon rapport qualité-prix. Le simili est bien imité.", "posted_relative": "il y a 2 semaines" },
+    { "product_code": "ZAR-PRD-bag-tote-01", "source": "instagram", "author": "@workbag", "rating": 5, "body": "Le tote que tout le monde veut au bureau ! Couleur chocolat incroyable.", "posted_relative": "il y a 1 semaine" },
+    { "product_code": "ZAR-PRD-bag-tote-01", "source": "instagram", "author": "@bagsoftheday", "rating": 4, "body": "Bonne capacité, look pro. Attention c'est du PU, pas du cuir.", "posted_relative": "il y a 6 jours" },
+    { "product_code": "ZAR-PRD-bag-tote-01", "source": "tiktok", "author": "@baghaul", "rating": 5, "body": "On dirait un Polène Numéro Un. Je le prends dans toutes les couleurs.", "posted_relative": "il y a 3 jours" },
+    { "product_code": "ZAR-PRD-bag-tote-01", "source": "tiktok", "author": "@officefit", "rating": 4, "body": "Bien structuré, tient debout tout seul. Parfait pour un look workwear.", "posted_relative": "il y a 1 semaine" },
+    { "product_code": "ZAR-PRD-bag-tote-01", "source": "reddit", "author": "u/totelover", "rating": 3, "body": "Looks nice but the PU is thin — cracked on a corner after 2 months.", "posted_relative": "il y a 3 semaines" },
+    { "product_code": "ZAR-PRD-bag-tote-01", "source": "reddit", "author": "u/workbagrec", "rating": 4, "body": "Solid work bag for under 40 euros. Fits laptop + lunch easily.", "posted_relative": "il y a 1 mois" },
+
+    { "product_code": "ZAR-PRD-knit-cable-01", "source": "google_merchant", "author": "Agathe F.", "rating": 5, "body": "Pull d'excellente qualité, maille dense, chaud. Rare chez Zara cette saison.", "posted_relative": "il y a 2 semaines" },
+    { "product_code": "ZAR-PRD-knit-cable-01", "source": "google_merchant", "author": "Bérénice L.", "rating": 4, "body": "Couleur camel magnifique, coupe ample confortable. Se boule un peu après plusieurs lavages.", "posted_relative": "il y a 3 semaines" },
+    { "product_code": "ZAR-PRD-knit-cable-01", "source": "trustpilot", "author": "Adèle Q.", "rating": 2, "body": "Gratte énormément au cou, impossible à porter à même la peau. Retour immédiat.", "posted_relative": "il y a 1 mois" },
+    { "product_code": "ZAR-PRD-knit-cable-01", "source": "trustpilot", "author": "Cécile T.", "rating": 5, "body": "Mon pull préféré de l'automne. Je vais en acheter un autre avant qu'il soit en rupture.", "posted_relative": "il y a 2 semaines" },
+    { "product_code": "ZAR-PRD-knit-cable-01", "source": "instagram", "author": "@cozyvibes", "rating": 5, "body": "Le pull parfait pour l'automne. Confortable et stylé.", "posted_relative": "il y a 1 semaine" },
+    { "product_code": "ZAR-PRD-knit-cable-01", "source": "instagram", "author": "@autumnstyle", "rating": 4, "body": "Belle maille torsadée, coupe relax. Taille grand par contre.", "posted_relative": "il y a 5 jours" },
+    { "product_code": "ZAR-PRD-knit-cable-01", "source": "tiktok", "author": "@knitwear", "rating": 4, "body": "Qualité correcte pour du Zara. Le beige est parfait pour l'hiver.", "posted_relative": "il y a 1 semaine" },
+    { "product_code": "ZAR-PRD-knit-cable-01", "source": "tiktok", "author": "@fallhaul", "rating": 5, "body": "Essentiel d'automne. Je le porte avec tout.", "posted_relative": "il y a 3 jours" },
+    { "product_code": "ZAR-PRD-knit-cable-01", "source": "reddit", "author": "u/knitquality", "rating": 3, "body": "Cable knit is cute but it pills after the second wash. Typical Zara wool blend.", "posted_relative": "il y a 3 semaines" },
+    { "product_code": "ZAR-PRD-knit-cable-01", "source": "reddit", "author": "u/fallcapsule", "rating": 5, "body": "Love this sweater. Warm, relaxed fit, and the camel color is gorgeous.", "posted_relative": "il y a 1 mois" }
+  ]
+}

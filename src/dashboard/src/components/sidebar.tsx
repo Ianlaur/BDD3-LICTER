@@ -6,17 +6,20 @@ import {
   LayoutDashboard,
   Map,
   Store,
+  Package,
   Heart,
   TrendingUp,
   AlertTriangle,
   Swords,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const NAV = [
   { href: "/", label: "Overview", icon: LayoutDashboard },
   { href: "/map", label: "Geo Map", icon: Map },
   { href: "/stores", label: "Stores", icon: Store },
+  { href: "/products", label: "Products", icon: Package },
   { href: "/sentiment", label: "Sentiment", icon: Heart },
   { href: "/trends", label: "Trends", icon: TrendingUp },
   { href: "/alerts", label: "Alerts", icon: AlertTriangle },
@@ -54,8 +57,11 @@ export function Sidebar() {
           );
         })}
       </nav>
-      <div className="mt-6 rounded-lg bg-neutral-100 p-3 text-xs text-neutral-600 dark:bg-neutral-900 dark:text-neutral-400">
-        BDD3 — Hackathon J1–J5
+      <div className="mt-6 space-y-2">
+        <ThemeToggle />
+        <div className="rounded-lg bg-neutral-100 p-3 text-xs text-neutral-600 dark:bg-neutral-900 dark:text-neutral-400">
+          BDD3 — Hackathon J1–J5
+        </div>
       </div>
     </aside>
   );

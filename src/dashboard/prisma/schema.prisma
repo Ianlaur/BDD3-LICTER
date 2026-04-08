@@ -197,6 +197,60 @@ model Kpi {
 }
 
 // ---------------------------------------------------------------------------
+// Product — a Zara SKU or product family, surfaced on the /products page.
+// Separate from ProductHealth (aggregate rollups) — this model holds the
+// canonical product record that reviews are attached to.
+// ---------------------------------------------------------------------------
+model Product {
+  id          String   @id @default(cuid())
+  code        String   @unique // internal product code (e.g. "ZAR-PRD-jean-straight-01")
+  name        String
+  category    String   // "tops" | "bottoms" | "outerwear" | "shoes" | "accessories"
+  color       String?  // dominant color, used for the visual swatch
+  priceEur    Float?
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  reviews ProductReview[]
+
+  @@index([category])
+  @@schema("dashboard")
+}
+
+// ---------------------------------------------------------------------------
+// ProductReview — multi-source reviews about a single product.
+// Sources: "google_merchant" | "trustpilot" | "instagram" | "tiktok" | "reddit"
+// ---------------------------------------------------------------------------
+model ProductReview {
+  id          String   @id @default(cuid())
+  source      String
+  externalId  String?
+  author      String?
+  rating      Int?     // 1..5 when available
+  title       String?
+  body        String
+  language    String?
+  url         String?
+  postedAt    DateTime
+  collectedAt DateTime @default(now())
+
+  // rating-derived sentiment, kept inline (no separate SentimentScore join) so
+  // the /products pages can stay simple and query a single table.
+  polarity    Float?
+  label       String?  // "negative" | "neutral" | "positive"
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([source, externalId])
+  @@index([productId])
+  @@index([source])
+  @@index([postedAt])
+  @@schema("dashboard")
+}
+
+// ---------------------------------------------------------------------------
 // Competitive — competitor benchmark snapshots from the competitive agent.
 // ---------------------------------------------------------------------------
 model Competitive {
